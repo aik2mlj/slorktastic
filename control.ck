@@ -1,5 +1,11 @@
 public class GameTrak {
     0 => int ID;
+    "192.168.180.1" => string SERVER_IP;
+
+    fun GameTrak(int id, string server_ip) {
+        id => ID;
+        server_ip => SERVER_IP;
+    }
 
     time lastTime;
     time currTime;
@@ -141,7 +147,7 @@ public class GameTrak {
     }
 
     OscOut xmit;
-    xmit.dest("192.168.180.1", 8000);
+    xmit.dest(SERVER_IP, 8000);
 
     fun void sendThrow(float angle) {
         chout <= "sending throw with angle: " <= angle <= IO.newline();
@@ -158,15 +164,4 @@ public class GameTrak {
         ready => xmit.add;
         xmit.send();
     }
-}
-
-GG.camera().orthographic();
-
-GameTrak gt;
-spork ~ gt.update();
-spork ~ gt.throwListener();
-spork ~ gt.catchListener();
-
-while (true) {
-    GG.nextFrame() => now;
 }
