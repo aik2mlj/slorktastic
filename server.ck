@@ -52,7 +52,7 @@ fun void checkThrow(int sourceID, float angle) {
 
     360 / N => float theta;
     ((2 * angle) / theta) - 1 => float targetPOV;
-    (sourceID + Math.round(targetPOV + 1)) % N => int targetID;
+    (sourceID + Math.round(targetPOV + 1) $ int) % N => targetID;
 
     for (int i; i < N; i++) {
         if (ps[i].ID == sourceID) {
@@ -83,14 +83,14 @@ fun void playerListener() {
                     msg.getInt(0) => int ID;
                     msg.getFloat(1) => float angle;
                     chout <= "throw from player: " <= ID <= " at angle " <= angle <= IO.newline();
-                    checkThrow(sourceID, angle);
+                    checkThrow(ID, angle);
                 }
             }
             if (msg.address == "/player/catch") {
                 if (msg.typetag == "ii") {
                     msg.getInt(0) => int ID;
                     msg.getInt(1) => int ready;
-                    ready => catchState[ID];
+                    ready => ps[ID].catchReady;
                     chout <= "catch state: " <= ID <= " " <= ready <= IO.newline();
                 }
             }
