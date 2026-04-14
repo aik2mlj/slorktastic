@@ -12,23 +12,25 @@ class PlayerState {
 
     // Which ADC channel the player is on
     int adc_channel;
+
     // Blackhole DAC channel
     int dac_channel;
 
-    fun PlayerState(int id, float ang, int adc_chan, int dac_chan) {
-        init(id, ang, adc_chan, dac_chan);
-    }
+    int target_channel;
 
-    fun void init(int id, int adc_chan, int dac_chan) {
+    fun PlayerState(int id) { init(id); }
+
+    fun void init(int id) {
         id => ID;
-        adc_chan => adc_channel;
-        dac_chan => dac_channel;
+        id => adc_channel;
+        id + 8 => dac_channel;
+        dac_channel => target_channel;
     }
 }
 
 // Initialize N players, ID = i, ADC = i, DAC = i + 8
 for (int i; i < N; i++) {
-    ps[i].init(i, i, i + 8);
+    ps[i].init(i);
 }
 
 // CLIENT -> SERVER
@@ -44,6 +46,7 @@ oin.addAddress("/player/catch");
 fun void checkThrow(int sourceID, float angle) {
     -999 => int sourceChan;
     -999 => int targetChan;
+    int oldTargetChan;
     int targetID;
 
 
@@ -54,6 +57,7 @@ fun void checkThrow(int sourceID, float angle) {
     for (int i; i < N; i++) {
         if (ps[i].ID == sourceID) {
             ps[i].adc_channel => sourceChan;
+            ps[i].target_channel => oldTargetChan;
         }
 
         if (ps[i].ID == targetID && ps[i].catchReady) {
@@ -65,7 +69,7 @@ fun void checkThrow(int sourceID, float angle) {
     if (sourceChan != -999 && targetChan != -999) {
         chout <= "player " <= targetID <= " successfuly caught the throw from player " <=
             sourceID <= IO.newline();
-        routeAudio(sourceChan, targetChan);
+        routeAudio(sourceChan, targetChan, oldTargetChan);
     }
 }
 
@@ -121,9 +125,10 @@ for (int i; i < xmit.size(); i++) {
     xmit[i].dest(hostnames[i], port);
 }
 
-fun void routeAudio(int source, int target) {
+fun void routeAudio(int source, int target, int oldTarget) {
     chout <= "routing audio from ADC channel " <= source <= " to DAC channel " <= target <=
         IO.newline();
+    adc.chan(source) =< dac.chan(oldTarget);
     adc.chan(source) => dac.chan(target);
 }
 
