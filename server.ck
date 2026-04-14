@@ -2,6 +2,11 @@
 //----------------------------------------------------------------------------
 // number of players
 3 => int N;
+
+if (me.args()) {
+    me.arg(0) => Std.atoi => N;
+}
+
 PlayerState ps[N];
 
 class PlayerState {
