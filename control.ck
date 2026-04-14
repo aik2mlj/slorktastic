@@ -86,11 +86,11 @@ public class GameTrak {
     catch_text.posY(-1.5);
 
     GText ID_text --> GG.scene();
-    Std.itoa(ID) => ID_text.text;
+    "Player " + Std.itoa(ID) => ID_text.text;
     ID_text.color(@(1, 1, 1));
-    ID_text.size(.5);
-    ID_text.posY(1.5);
-    ID_text.posX(-1);
+    ID_text.size(.3);
+    ID_text.posY(2.5);
+    ID_text.posX(-2.5);
 
     fun void throwListener() {
         while (true) {
