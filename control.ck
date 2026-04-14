@@ -17,7 +17,7 @@ public class GameTrak {
     .9 => float SMOOTHING_FACTOR;
 
     // Set up GameTrak
-    // 0 => int device;
+    0 => int device;
     // if (me.args())
     //     me.arg(0) => Std.atoi => device;
 
