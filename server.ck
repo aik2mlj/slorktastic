@@ -109,27 +109,27 @@ spork ~ playerListener();
 // SERVER -> CLIENT
 //----------------------------------------------------------------------------
 // destination port number
-6449 => int port;
+// 6449 => int port;
 
-// array of destination hostnames
-string hostnames[0];
+// // array of destination hostnames
+// string hostnames[0];
 
-//----------------------------------------------------------------------------
-// appending names of destinations
-//----------------------------------------------------------------------------
+// //----------------------------------------------------------------------------
+// // appending names of destinations
+// //----------------------------------------------------------------------------
 
-// hostnames << "localhost";
-// Alex 192.168.180.1
-hostnames << "192.168.176.224"; // Summer
-hostnames << "192.168.186.82";  // Lejun
+// // hostnames << "localhost";
+// // Alex 192.168.180.1
+// hostnames << "192.168.176.224"; // Summer
+// hostnames << "192.168.186.82";  // Lejun
 
-// sender object
-OscOut xmit[hostnames.size()];
-// iterate over the OSC transmitters
-for (int i; i < xmit.size(); i++) {
-    // aim the transmitter at destination
-    xmit[i].dest(hostnames[i], port);
-}
+// // sender object
+// OscOut xmit[hostnames.size()];
+// // iterate over the OSC transmitters
+// for (int i; i < xmit.size(); i++) {
+//     // aim the transmitter at destination
+//     xmit[i].dest(hostnames[i], port);
+// }
 
 fun void routeAudio(int source, int target, int oldTarget) {
     chout <= "routing audio from ADC channel " <= source <= " to DAC channel " <= target <=

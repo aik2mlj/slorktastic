@@ -23,6 +23,9 @@ public class GameTrak {
     ID_text.posY(2.5);
     ID_text.posX(-2.5);
 
+    OscOut xmit;
+    xmit.dest(SERVER_IP, 8000);
+
     time lastTime;
     time currTime;
     float lastAxis[6];
@@ -48,6 +51,7 @@ public class GameTrak {
         id => ID;
         "Player " + Std.itoa(ID) => ID_text.text;
         server_ip => SERVER_IP;
+        xmit.dest(SERVER_IP, 8000);
     }
 
     fun void update() {
@@ -162,8 +166,6 @@ public class GameTrak {
         }
     }
 
-    OscOut xmit;
-    xmit.dest(SERVER_IP, 8000);
 
     fun void sendThrow(float angle) {
         chout <= "sending throw with angle: " <= angle <= "to server: " <= SERVER_IP <=
