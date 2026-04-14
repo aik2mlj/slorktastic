@@ -77,8 +77,13 @@ public class GameTrak {
     vec2 start;
     vec2 end;
     int throwing;
-
     float throw_angle;
+
+    GText catch_text --> GG.scene();
+    "" => catch_text.text;
+    catch_text.color(@(1, 1, 1));
+    catch_text.size(.5);
+    catch_text.posY(-1.5);
 
     fun void throwListener() {
         while (true) {
@@ -134,11 +139,13 @@ public class GameTrak {
             if (catch_diff < diff_threshold && axis[2] > .3 && axis[5] > .3) {
                 if (!catchReady) {
                     true => catchReady;
+                    "CATCH READY" => catch_text.text;
                     sendCatch(catchReady);
                 }
             } else {
                 if (catchReady) {
                     false => catchReady;
+                    "" => catch_text.text;
                     sendCatch(catchReady);
                 }
             }
