@@ -85,6 +85,13 @@ public class GameTrak {
     catch_text.size(.5);
     catch_text.posY(-1.5);
 
+    GText ID_text --> GG.scene();
+    Std.itoa(ID) => ID_text.text;
+    ID_text.color(@(1, 1, 1));
+    ID_text.size(.5);
+    ID_text.posY(1.5);
+    ID_text.posX(-1);
+
     fun void throwListener() {
         while (true) {
             Math.sqrt(Math.pow(velocity[3], 2) + Math.pow(velocity[4], 2)) => float speed;
@@ -157,7 +164,8 @@ public class GameTrak {
     xmit.dest(SERVER_IP, 8000);
 
     fun void sendThrow(float angle) {
-        chout <= "sending throw with angle: " <= angle <= IO.newline();
+        chout <= "sending throw with angle: " <= angle <= "to server: " <= SERVER_IP <=
+            IO.newline();
         xmit.start("/player/throw");
         ID => xmit.add;
         angle => xmit.add;
@@ -165,7 +173,8 @@ public class GameTrak {
     }
 
     fun void sendCatch(int ready) {
-        chout <= "sending catch with ID: " <= ID <= " ready: " <= ready <= IO.newline();
+        chout <= "sending catch with ID: " <= ID <= " ready: " <= ready <= "to server: " <=
+            SERVER_IP <= IO.newline();
         xmit.start("/player/catch");
         ID => xmit.add;
         ready => xmit.add;

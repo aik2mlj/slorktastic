@@ -83,6 +83,7 @@ fun void playerListener() {
         oin => now;
 
         while (oin.recv(msg)) {
+            chout <= "received message: " <= msg.address <= IO.newline();
             if (msg.address == "/player/throw") {
                 if (msg.typetag == "if") {
                     msg.getInt(0) => int ID;
