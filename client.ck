@@ -2,8 +2,16 @@
 
 GG.camera().orthographic();
 
+0 => int id;
+"192.168.186.82" => string server;
+
+if (me.args()) {
+    me.arg(0) => Std.atoi => id;
+    me.arg(1) => server;
+}
+
 // Set your ID and server IP here
-GameTrak gt(0, "192.168.186.82");
+GameTrak gt(id, server);
 spork ~ gt.update();
 spork ~ gt.throwListener();
 spork ~ gt.catchListener();
