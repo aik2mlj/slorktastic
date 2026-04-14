@@ -2,10 +2,26 @@ public class GameTrak {
     0 => int ID;
     "192.168.180.1" => string SERVER_IP;
 
-    fun GameTrak(int id, string server_ip) {
-        id => ID;
-        server_ip => SERVER_IP;
-    }
+    GLines line --> GG.scene();
+    line.width(.1);
+
+    vec2 start;
+    vec2 end;
+    int throwing;
+    float throw_angle;
+
+    GText catch_text --> GG.scene();
+    "" => catch_text.text;
+    catch_text.color(@(1, 1, 1));
+    catch_text.size(.5);
+    catch_text.posY(-1.5);
+
+    GText ID_text --> GG.scene();
+    "Player " + Std.itoa(ID) => ID_text.text;
+    ID_text.color(@(1, 1, 1));
+    ID_text.size(.3);
+    ID_text.posY(2.5);
+    ID_text.posX(-2.5);
 
     time lastTime;
     time currTime;
@@ -26,6 +42,12 @@ public class GameTrak {
         <<< "GameTrak / joystick:", trak.name(), "on" >>>;
     } else {
         <<< "No joystick — use UI" >>>;
+    }
+
+    fun GameTrak(int id, string server_ip) {
+        id => ID;
+        "Player " + Std.itoa(ID) => ID_text.text;
+        server_ip => SERVER_IP;
     }
 
     fun void update() {
@@ -71,26 +93,6 @@ public class GameTrak {
         }
     }
 
-    GLines line --> GG.scene();
-    line.width(.1);
-
-    vec2 start;
-    vec2 end;
-    int throwing;
-    float throw_angle;
-
-    GText catch_text --> GG.scene();
-    "" => catch_text.text;
-    catch_text.color(@(1, 1, 1));
-    catch_text.size(.5);
-    catch_text.posY(-1.5);
-
-    GText ID_text --> GG.scene();
-    "Player " + Std.itoa(ID) => ID_text.text;
-    ID_text.color(@(1, 1, 1));
-    ID_text.size(.3);
-    ID_text.posY(2.5);
-    ID_text.posX(-2.5);
 
     fun void throwListener() {
         while (true) {
