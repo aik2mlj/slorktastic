@@ -47,6 +47,7 @@ class PlayerState {
     fun void playLoop() {
         while (true) {
             {
+                <<< "Current recording duration: " <= recDuration >>>;
                 buf.getVoice() => int v;
                 if (v < 0)
                     return;
@@ -62,7 +63,7 @@ class PlayerState {
                 RAMP_TIME => now;
 
                 <<< "SUSTAIN" >>>;
-                recDuration - 2 * RAMP_TIME => now;
+                recDuration => now;
 
                 buf.rampDown(v, RAMP_TIME);
                 <<< "RELEASE" >>>;
