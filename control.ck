@@ -188,8 +188,7 @@ public class GameTrak {
             while (hi.recv(msg)) {
                 // check for action type
                 if (msg.isButtonDown() && msg.key == 44 && !RECORDING) {
-                    // <<< "down:", msg.which, "(code)", msg.key, "(usb key)", msg.ascii, "(ascii)"
-                    // >>>;
+                    <<< "down:", msg.which, "(code)", msg.key, "(usb key)", msg.ascii, "(ascii)" >>>;
                     true => RECORDING;
                     // now => recordingStart;
                     // <<< "RECORDING ON" >>>;
