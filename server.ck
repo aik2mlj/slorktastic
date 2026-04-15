@@ -41,7 +41,7 @@ class PlayerState {
         id + 8 => dac_channel;
         dac_channel => target_channel;
 
-        adc.chan(adc_channel) => buf => dac.chan(dac_channel);
+        adc.chan(adc_channel) => dac.chan(dac_channel);
     }
 
     fun void playLoop() {
@@ -75,7 +75,7 @@ class PlayerState {
 // Initialize N players, ID = i, ADC = i, DAC = i + 8
 for (int i; i < N; i++) {
     ps[i].init(i);
-    spork ~ ps[i].playLoop();
+    // spork ~ ps[i].playLoop();
 }
 
 // CLIENT -> SERVER
@@ -125,11 +125,11 @@ fun void handleRecord(int ID, int toggle) {
             if (toggle) {
                 now => ps[i].recStart;
                 chout <= "recording started for player " <= ID <= IO.newline();
-                ps[i].buf.record(true);
+                // ps[i].buf.record(true);
             } else {
                 chout <= "recording stopped for player " <= ID <= IO.newline();
                 now - ps[i].recStart => ps[i].recDuration;
-                ps[i].buf.record(false);
+                // ps[i].buf.record(false);
             }
         }
     }
@@ -202,11 +202,11 @@ fun void routeAudio(int source, int target, int oldTarget) {
     chout <= "routing audio from ADC channel " <= source <= " to DAC channel " <= target <=
         IO.newline();
 
-    // adc.chan(source) =< dac.chan(oldTarget);
-    // adc.chan(source) => dac.chan(target);
+    adc.chan(source) =< dac.chan(oldTarget);
+    adc.chan(source) => dac.chan(target);
 
-    ps[source].buf =< dac.chan(oldTarget);
-    ps[source].buf => dac.chan(target);
+    // ps[source].buf =< dac.chan(oldTarget);
+    // ps[source].buf => dac.chan(target);
 }
 
 

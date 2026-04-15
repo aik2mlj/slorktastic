@@ -1,7 +1,7 @@
 public class GameTrak {
     // Individual player variables
     0 => int ID;
-    "192.168.180.1" => string SERVER_IP;
+    "192.168.186.82" => string SERVER_IP;
     OscOut xmit;
     xmit.dest(SERVER_IP, 8000);
 
