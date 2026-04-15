@@ -46,7 +46,7 @@ class PlayerState {
 
     fun void playLoop() {
         while (true) {
-            if (recDuration > 0::second) {
+            {
                 buf.getVoice() => int v;
                 if (v < 0)
                     return;
