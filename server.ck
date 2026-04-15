@@ -125,6 +125,7 @@ fun void handleRecord(int ID, int toggle) {
         if (ps[i].ID == ID) {
             if (toggle) {
                 now => ps[i].recStart;
+                ps[i].buf.clear();
                 chout <= "recording started for player " <= ID <= IO.newline();
                 ps[i].buf.record(true);
             } else {
