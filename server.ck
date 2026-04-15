@@ -2,12 +2,53 @@
 //----------------------------------------------------------------------------
 // number of players
 3 => int N;
+5 => int MAX_BUFFER;
 
 if (me.args()) {
     me.arg(0) => Std.atoi => N;
 }
 
 PlayerState ps[N];
+
+class LiSaBuf {
+    LiSa lisa;
+    time recStart;
+    dur recDuration;
+
+    10::second => dur MAX_BUFFER_DURATION;
+    8 => int NUM_VOICES;
+    20::ms => dur RAMP_TIME;
+
+    MAX_BUFFER_DURATION => lisa.duration;
+    NUM_VOICES => lisa.maxVoices;
+    RAMP_TIME => lisa.recRamp;
+
+    fun void playLoop() {
+        while (true) {
+            <<< "Current recording duration: ", recDuration >>>;
+            lisa.getVoice() => int v;
+            if (v < 0)
+                return;
+
+            lisa.voiceGain(v, .5);
+            lisa.rate(v, 1.0);
+            lisa.loop(v, 1);
+
+            <<< "ATTACK" >>>;
+            lisa.playPos(v, 0::samp);
+
+            lisa.rampUp(v, RAMP_TIME);
+            RAMP_TIME => now;
+
+            <<< "SUSTAIN" >>>;
+            recDuration => now;
+
+            lisa.rampDown(v, RAMP_TIME);
+            <<< "RELEASE" >>>;
+            RAMP_TIME => now;
+        }
+    }
+}
 
 class PlayerState {
     // Player ID, 0-indexed
@@ -21,18 +62,10 @@ class PlayerState {
     // The dac channel that the player has thrown to
     int target_channel;
 
-    LiSa buf;
-    now => time recStart;
-    dur recDuration;
-
-    10::second => dur MAX_BUFFER_DURATION;
-    8 => int NUM_VOICES;
-    20::ms => dur RAMP_TIME;
-
-    MAX_BUFFER_DURATION => buf.duration;
-    NUM_VOICES => buf.maxVoices;
-    RAMP_TIME => buf.recRamp;
-
+    // This is a stack of buffers, whatever on the top get recorded or thrown
+    LiSaBuf bufs[MAX_BUFFER];
+    // pointer to the top buffer
+    0 => int p;
     fun PlayerState(int id) { init(id); }
 
     fun void init(int id) {
@@ -41,42 +74,46 @@ class PlayerState {
         id + 8 => dac_channel;
         dac_channel => target_channel;
 
-        adc.chan(adc_channel) => buf => dac.chan(dac_channel);
+        // The adc & dac channel now won't change, only that some buffers may disconnect / reconnect
+        // to the adc & dac channel
+        for (int i; i < MAX_BUFFER; i++) {
+            adc.chan(adc_channel) => bufs[i].lisa => dac.chan(dac_channel);
+        }
     }
 
-    fun void playLoop() {
-        while (true) {
-            {
-                <<< "Current recording duration: ", recDuration >>>;
-                buf.getVoice() => int v;
-                if (v < 0)
-                    return;
+    fun LiSaBuf @topBuf() { return bufs[p]; }
 
-                buf.voiceGain(v, .5);
-                buf.rate(v, 1.0);
-                buf.loop(v, 1);
+    fun void pushBuf(LiSaBuf @buf) {
+        (p + 1) % MAX_BUFFER => p;
+        buf @=> bufs[p];
 
-                <<< "ATTACK" >>>;
-                buf.playPos(v, 0::samp);
+        // TODO: maybe should check if they are connected already?
+        // connect to the adc & dac
+        adc.chan(adc_channel) => bufs[p].lisa => dac.chan(dac_channel);
+    }
 
-                buf.rampUp(v, RAMP_TIME);
-                RAMP_TIME => now;
+    fun void popBuf() {
+        // disconnect to the adc & dac
+        adc =< bufs[p].lisa;
+        bufs[p].lisa =< dac.chan(dac_channel);
 
-                <<< "SUSTAIN" >>>;
-                recDuration => now;
+        (p - 1) % MAX_BUFFER => p;
+    }
 
-                buf.rampDown(v, RAMP_TIME);
-                <<< "RELEASE" >>>;
-                RAMP_TIME => now;
-            }
-        }
+    fun void playLoop(int id) {
+        bufs[id] @=> LiSaBuf buf;
+        buf.playLoop();
     }
 }
 
 // Initialize N players, ID = i, ADC = i, DAC = i + 8
 for (int i; i < N; i++) {
     ps[i].init(i);
-    spork ~ ps[i].playLoop();
+
+    // playLoop always running for all buffers
+    for (int j; j < MAX_BUFFER; j++) {
+        spork ~ ps[i].playLoop(j);
+    }
 }
 
 // CLIENT -> SERVER
@@ -123,15 +160,18 @@ fun void checkThrow(int sourceID, float angle) {
 fun void handleRecord(int ID, int toggle) {
     for (int i; i < N; i++) {
         if (ps[i].ID == ID) {
+            // the top buffer of that ps
+            ps[i].topBuf() @=> LiSaBuf @buf;
+
             if (toggle) {
-                now => ps[i].recStart;
-                ps[i].buf.clear();
+                now => buf.recStart;
+                buf.lisa.clear();
                 chout <= "recording started for player " <= ID <= IO.newline();
-                ps[i].buf.record(true);
+                buf.lisa.record(true);
             } else {
                 chout <= "recording stopped for player " <= ID <= IO.newline();
-                now - ps[i].recStart => ps[i].recDuration;
-                ps[i].buf.record(false);
+                now - buf.recStart => buf.recDuration;
+                buf.lisa.record(false);
             }
         }
     }
@@ -207,8 +247,12 @@ fun void routeAudio(int source, int target, int oldTarget) {
     // adc.chan(source) =< dac.chan(oldTarget);
     // adc.chan(source) => dac.chan(target);
 
-    ps[source].buf =< dac.chan(oldTarget);
-    ps[source].buf => dac.chan(target);
+    // ps[source].topBuf() =< dac.chan(oldTarget);
+    // ps[source].topBuf() => dac.chan(target);
+
+    // TODO: clean target
+    ps[target - 8].pushBuf(ps[source].topBuf());
+    ps[source].popBuf();
 }
 
 
