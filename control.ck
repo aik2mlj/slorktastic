@@ -172,7 +172,7 @@ public class GameTrak {
 
     Hid hi;
     HidMsg msg;
-    if (!hi.openKeyboard(0))
+    if (!hi.openKeyboard(1))
         me.exit();
     <<< "keyboard '" + hi.name() + "' ready", "" >>>;
 

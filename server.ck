@@ -41,31 +41,33 @@ class PlayerState {
         id + 8 => dac_channel;
         dac_channel => target_channel;
 
-        adc.chan(adc_channel) => dac.chan(dac_channel);
+        adc.chan(adc_channel) => buf => dac.chan(dac_channel);
     }
 
     fun void playLoop() {
         while (true) {
-            buf.getVoice() => int v;
-            if (v < 0)
-                return;
+            if (recDuration > 0::second) {
+                buf.getVoice() => int v;
+                if (v < 0)
+                    return;
 
-            buf.voiceGain(v, .5);
-            buf.rate(v, 1.0);
-            buf.loop(v, 1);
+                buf.voiceGain(v, .5);
+                buf.rate(v, 1.0);
+                buf.loop(v, 1);
 
-            <<< "ATTACK" >>>;
-            buf.playPos(v, 0::samp);
+                <<< "ATTACK" >>>;
+                buf.playPos(v, 0::samp);
 
-            buf.rampUp(v, RAMP_TIME);
-            RAMP_TIME => now;
+                buf.rampUp(v, RAMP_TIME);
+                RAMP_TIME => now;
 
-            <<< "SUSTAIN" >>>;
-            recDuration - 2 * RAMP_TIME => now;
+                <<< "SUSTAIN" >>>;
+                recDuration - 2 * RAMP_TIME => now;
 
-            buf.rampDown(v, RAMP_TIME);
-            <<< "RELEASE" >>>;
-            RAMP_TIME => now;
+                buf.rampDown(v, RAMP_TIME);
+                <<< "RELEASE" >>>;
+                RAMP_TIME => now;
+            }
         }
     }
 }
@@ -199,8 +201,12 @@ spork ~ playerListener();
 fun void routeAudio(int source, int target, int oldTarget) {
     chout <= "routing audio from ADC channel " <= source <= " to DAC channel " <= target <=
         IO.newline();
-    adc.chan(source) =< dac.chan(oldTarget);
-    adc.chan(source) => dac.chan(target);
+
+    // adc.chan(source) =< dac.chan(oldTarget);
+    // adc.chan(source) => dac.chan(target);
+
+    ps[source].buf =< dac.chan(oldTarget);
+    ps[source].buf => dac.chan(target);
 }
 
 
