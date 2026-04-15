@@ -19,6 +19,7 @@ GameTrak gt(id, server);
 spork ~ gt.update();
 spork ~ gt.throwListener();
 spork ~ gt.catchListener();
+spork ~ gt.kbListener();
 
 while (true) {
     GG.nextFrame() => now;

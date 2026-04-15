@@ -1,7 +1,12 @@
 public class GameTrak {
+    // Individual player variables
     0 => int ID;
     "192.168.180.1" => string SERVER_IP;
+    OscOut xmit;
+    xmit.dest(SERVER_IP, 8000);
 
+    // Graphics
+    // ------------------------------------------------------------
     GLines line --> GG.scene();
     line.width(.1);
 
@@ -23,9 +28,8 @@ public class GameTrak {
     ID_text.posY(2.5);
     ID_text.posX(-2.5);
 
-    OscOut xmit;
-    xmit.dest(SERVER_IP, 8000);
 
+    // GameTrak handling
     time lastTime;
     time currTime;
     float lastAxis[6];
@@ -166,9 +170,48 @@ public class GameTrak {
         }
     }
 
+    Hid hi;
+    HidMsg msg;
+    if (!hi.openKeyboard(0))
+        me.exit();
+    <<< "keyboard '" + hi.name() + "' ready", "" >>>;
+
+    false => int RECORDING;
+
+    fun void kbListener() {
+        // infinite event loop
+        while (true) {
+            // wait on event
+            hi => now;
+
+            // get one or more messages
+            while (hi.recv(msg)) {
+                // check for action type
+                if (msg.isButtonDown() && msg.key == 44 && !RECORDING) {
+                    // <<< "down:", msg.which, "(code)", msg.key, "(usb key)", msg.ascii, "(ascii)"
+                    // >>>;
+                    true => RECORDING;
+                    // now => recordingStart;
+                    // <<< "RECORDING ON" >>>;
+                    // buf.record(true);
+                    sendRecord(true);
+                } else {
+                    if (msg.key == 44 && RECORDING) {
+                        false => RECORDING;
+                        sendRecord(false);
+                        // now - recordingStart => recordingDuration;
+                        // <<< "recording duration:", recordingDuration >>>;
+                        // <<< "RECORDING OFF" >>>;
+                        // buf.record(false);
+                        // spork ~ play(0, .5, 1, recordingDuration);
+                    }
+                }
+            }
+        }
+    }
 
     fun void sendThrow(float angle) {
-        chout <= "sending throw with angle: " <= angle <= "to server: " <= SERVER_IP <=
+        chout <= "sending throw with angle: " <= angle <= " to server: " <= SERVER_IP <=
             IO.newline();
         xmit.start("/player/throw");
         ID => xmit.add;
@@ -177,11 +220,20 @@ public class GameTrak {
     }
 
     fun void sendCatch(int ready) {
-        chout <= "sending catch with ID: " <= ID <= " ready: " <= ready <= "to server: " <=
+        chout <= "sending catch with ID: " <= ID <= " ready: " <= ready <= " to server: " <=
             SERVER_IP <= IO.newline();
         xmit.start("/player/catch");
         ID => xmit.add;
         ready => xmit.add;
+        xmit.send();
+    }
+
+    fun void sendRecord(int toggle) {
+        chout <= "sending record signal to server: " <= toggle <= " to server: " <= SERVER_IP <=
+            IO.newline();
+        xmit.start("/player/record");
+        ID => xmit.add;
+        toggle => xmit.add;
         xmit.send();
     }
 }

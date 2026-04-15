@@ -10,18 +10,28 @@ if (me.args()) {
 PlayerState ps[N];
 
 class PlayerState {
-    // Player ID, 1-indexed
+    // Player ID, 0-indexed
     int ID;
     // Whether the player is ready to catch
     int catchReady;
-
     // Which ADC channel the player is on
     int adc_channel;
-
     // Blackhole DAC channel
     int dac_channel;
-
+    // The dac channel that the player has thrown to
     int target_channel;
+
+    LiSa buf;
+    now => time recStart;
+    dur recDuration;
+
+    10::second => dur MAX_BUFFER_DURATION;
+    8 => int NUM_VOICES;
+    20::ms => dur RAMP_TIME;
+
+    MAX_BUFFER_DURATION => buf.duration;
+    NUM_VOICES => buf.maxVoices;
+    RAMP_TIME => buf.recRamp;
 
     fun PlayerState(int id) { init(id); }
 
@@ -33,11 +43,37 @@ class PlayerState {
 
         adc.chan(adc_channel) => dac.chan(dac_channel);
     }
+
+    fun void playLoop() {
+        while (true) {
+            buf.getVoice() => int v;
+            if (v < 0)
+                return;
+
+            buf.voiceGain(v, .5);
+            buf.rate(v, 1.0);
+            buf.loop(v, 1);
+
+            <<< "ATTACK" >>>;
+            buf.playPos(v, 0::samp);
+
+            buf.rampUp(v, RAMP_TIME);
+            RAMP_TIME => now;
+
+            <<< "SUSTAIN" >>>;
+            recDuration - 2 * RAMP_TIME => now;
+
+            buf.rampDown(v, RAMP_TIME);
+            <<< "RELEASE" >>>;
+            RAMP_TIME => now;
+        }
+    }
 }
 
 // Initialize N players, ID = i, ADC = i, DAC = i + 8
 for (int i; i < N; i++) {
     ps[i].init(i);
+    spork ~ ps[i].playLoop();
 }
 
 // CLIENT -> SERVER
@@ -49,6 +85,7 @@ OscMsg msg;
 
 oin.addAddress("/player/throw");
 oin.addAddress("/player/catch");
+oin.addAddress("/player/record");
 
 fun void checkThrow(int sourceID, float angle) {
     -999 => int sourceChan;
@@ -80,6 +117,22 @@ fun void checkThrow(int sourceID, float angle) {
     }
 }
 
+fun void handleRecord(int ID, int toggle) {
+    for (int i; i < N; i++) {
+        if (ps[i].ID == ID) {
+            if (toggle) {
+                now => ps[i].recStart;
+                chout <= "recording started for player " <= ID <= IO.newline();
+                ps[i].buf.record(true);
+            } else {
+                chout <= "recording stopped for player " <= ID <= IO.newline();
+                now - ps[i].recStart => ps[i].recDuration;
+                ps[i].buf.record(false);
+            }
+        }
+    }
+}
+
 fun void playerListener() {
     while (true) {
         oin => now;
@@ -100,6 +153,15 @@ fun void playerListener() {
                     msg.getInt(1) => int ready;
                     ready => ps[ID].catchReady;
                     chout <= "catch state: " <= ID <= " " <= ready <= IO.newline();
+                }
+            }
+            if (msg.address == "/player/record") {
+                if (msg.typetag == "ii") {
+                    msg.getInt(0) => int ID;
+                    msg.getInt(1) => int toggle;
+                    // TODO: trigger record ON/OFF
+                    handleRecord(ID, toggle);
+                    chout <= "record state: " <= ID <= " " <= toggle <= IO.newline();
                 }
             }
         }
@@ -132,6 +194,7 @@ spork ~ playerListener();
 //     // aim the transmitter at destination
 //     xmit[i].dest(hostnames[i], port);
 // }
+
 
 fun void routeAudio(int source, int target, int oldTarget) {
     chout <= "routing audio from ADC channel " <= source <= " to DAC channel " <= target <=
