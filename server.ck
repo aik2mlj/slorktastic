@@ -30,6 +30,8 @@ class PlayerState {
         id => adc_channel;
         id + 8 => dac_channel;
         dac_channel => target_channel;
+
+        adc.chan(adc_channel) => dac.chan(dac_channel);
     }
 }
 
