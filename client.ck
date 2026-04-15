@@ -1,5 +1,9 @@
 @import "control.ck"
 
+for (int i; i < 6; i++) {
+    adc.chan(0) => dac.chan(i);
+}
+
 GG.camera().orthographic();
 
 0 => int id;
