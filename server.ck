@@ -126,11 +126,11 @@ fun void handleRecord(int ID, int toggle) {
             if (toggle) {
                 now => ps[i].recStart;
                 chout <= "recording started for player " <= ID <= IO.newline();
-                // ps[i].buf.record(true);
+                ps[i].buf.record(true);
             } else {
                 chout <= "recording stopped for player " <= ID <= IO.newline();
                 now - ps[i].recStart => ps[i].recDuration;
-                // ps[i].buf.record(false);
+                ps[i].buf.record(false);
             }
         }
     }
