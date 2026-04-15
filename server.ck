@@ -59,8 +59,6 @@ class PlayerState {
     int adc_channel;
     // Blackhole DAC channel
     int dac_channel;
-    // The dac channel that the player has thrown to
-    int target_channel;
 
     // This is a stack of buffers, whatever on the top get recorded or thrown
     LiSaBuf bufs[MAX_BUFFER];
@@ -72,7 +70,6 @@ class PlayerState {
         id => ID;
         id => adc_channel;
         id + 8 => dac_channel;
-        dac_channel => target_channel;
 
         // The adc & dac channel now won't change, only that some buffers may disconnect / reconnect
         // to the adc & dac channel
@@ -128,9 +125,7 @@ oin.addAddress("/player/catch");
 oin.addAddress("/player/record");
 
 fun void checkThrow(int sourceID, float angle) {
-    -999 => int sourceChan;
-    -999 => int targetChan;
-    int oldTargetChan;
+    0 => int throwSuccess;
     int targetID;
 
 
@@ -139,21 +134,16 @@ fun void checkThrow(int sourceID, float angle) {
     (sourceID + Math.round(targetPOV + 1) $ int) % N => targetID;
 
     for (int i; i < N; i++) {
-        if (ps[i].ID == sourceID) {
-            ps[i].adc_channel => sourceChan;
-            ps[i].target_channel => oldTargetChan;
-        }
-
         if (ps[i].ID == targetID && ps[i].catchReady) {
             // ps[i] is the player we are throwing to
-            ps[i].dac_channel => targetChan;
+            1 => throwSuccess;
         }
     }
 
-    if (sourceChan != -999 && targetChan != -999) {
+    if (throwSuccess) {
         chout <= "player " <= targetID <= " successfuly caught the throw from player " <=
             sourceID <= IO.newline();
-        routeAudio(sourceChan, targetChan, oldTargetChan);
+        routeAudio(sourceID, targetID);
     }
 }
 
@@ -240,19 +230,9 @@ spork ~ playerListener();
 // }
 
 
-fun void routeAudio(int source, int target, int oldTarget) {
-    chout <= "routing audio from ADC channel " <= source <= " to DAC channel " <= target <=
-        IO.newline();
-
-    // adc.chan(source) =< dac.chan(oldTarget);
-    // adc.chan(source) => dac.chan(target);
-
-    // ps[source].topBuf() =< dac.chan(oldTarget);
-    // ps[source].topBuf() => dac.chan(target);
-
-    // TODO: clean target
-    ps[target - 8].pushBuf(ps[source].topBuf());
-    ps[source].popBuf();
+fun void routeAudio(int sourceID, int targetID) {
+    ps[targetID].pushBuf(ps[sourceID].topBuf());
+    ps[sourceID].popBuf();
 }
 
 
