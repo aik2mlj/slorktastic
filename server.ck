@@ -47,7 +47,7 @@ class PlayerState {
     fun void playLoop() {
         while (true) {
             {
-                <<< "Current recording duration: " <= recDuration >>>;
+                <<< "Current recording duration: ", recDuration >>>;
                 buf.getVoice() => int v;
                 if (v < 0)
                     return;
