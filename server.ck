@@ -141,7 +141,7 @@ fun void checkThrow(int sourceID, float angle) {
         }
     }
 
-    if (throwSuccess) {
+    if (throwSuccess && targetID != sourceID) {
         chout <= "player " <= targetID <= " successfuly caught the throw from player " <=
             sourceID <= IO.newline();
         routeAudio(sourceID, targetID);
