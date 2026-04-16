@@ -108,7 +108,7 @@ public class GameTrak {
             // chout <= "speed: " <= speed <= IO.newline();
 
             // speed crosses threshold for throw start
-            if (speed > 30.0) {
+            if (speed > 45.0) {
                 if (!throwing) {
                     // velocity[3] => start.x;
                     // velocity[4] => start.y;
