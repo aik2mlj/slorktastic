@@ -135,6 +135,8 @@ public class GameTrak {
                         chout <= "throwing with angle: " <= throw_angle <= IO.newline();
                         <<< start.x, start.y, end.x, end.y >>>;
                         sendThrow(throw_angle);
+
+                        0.5::second => now;
                     }
                 }
             }
