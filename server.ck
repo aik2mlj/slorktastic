@@ -111,8 +111,10 @@ class PlayerState {
         vacantBuf.lisa.clear();
         vacantBuf.lisa.recPos(0::samp);
 
+        vacantBuf @=> bufs[p];
+
         // connect the vacantBuf to the adc & dac
-        adc.chan(adc_channel) => vacantBuf.lisa => lim;
+        adc.chan(adc_channel) => bufs[p].lisa => lim;
 
         (p - 1) % MAX_BUFFER => p;
     }
