@@ -102,6 +102,15 @@ class PlayerState {
         (p - 1) % MAX_BUFFER => p;
     }
 
+    fun void popSelf() {
+        // this is different from popBuf that we don't need to disconnect the pipeline
+        // just clear the lisa buffer and rotate the pointer
+        bufs[p].lisa.clear();
+        bufs[p].lisa.recPos(0::samp);
+
+        (p - 1) % MAX_BUFFER => p;
+    }
+
     fun void playLoop(int id) {
         bufs[id] @=> LiSaBuf buf;
         buf.playLoop();
@@ -177,7 +186,7 @@ fun void handleRecord(int ID, int toggle) {
 fun void handlePop(int ID) {
     for (int i; i < N; i++) {
         if (ps[i].ID == ID) {
-            ps[i].popBuf();
+            ps[i].popSelf();
         }
     }
 }
