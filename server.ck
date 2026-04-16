@@ -25,7 +25,7 @@ class LiSaBuf {
 
     fun void playLoop() {
         while (true) {
-            <<< "Current recording duration: ", recDuration >>>;
+            // <<< "Current recording duration: ", recDuration >>>;
             lisa.getVoice() => int v;
             if (v < 0)
                 return;
@@ -34,17 +34,17 @@ class LiSaBuf {
             lisa.rate(v, 1.0);
             lisa.loop(v, 1);
 
-            <<< "ATTACK" >>>;
+            // <<< "ATTACK" >>>;
             lisa.playPos(v, 0::samp);
 
             lisa.rampUp(v, RAMP_TIME);
             RAMP_TIME => now;
 
-            <<< "SUSTAIN" >>>;
+            // <<< "SUSTAIN" >>>;
             recDuration => now;
 
             lisa.rampDown(v, RAMP_TIME);
-            <<< "RELEASE" >>>;
+            // <<< "RELEASE" >>>;
             RAMP_TIME => now;
         }
     }
@@ -75,6 +75,7 @@ class PlayerState {
         // to the adc & dac channel
         for (int i; i < MAX_BUFFER; i++) {
             adc.chan(adc_channel) => bufs[i].lisa => dac.chan(dac_channel);
+            <<< "Player " <= id <= " buffer " <= bufs[i];
         }
     }
 
