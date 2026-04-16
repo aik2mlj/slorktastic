@@ -189,13 +189,18 @@ public class GameTrak {
             // get one or more messages
             while (hi.recv(msg)) {
                 // check for action type
-                if (msg.isButtonDown() && msg.key == 44 && !RECORDING) {
+                if (msg.isButtonDown()) {
                     <<< "down:", msg.which, "(code)", msg.key, "(usb key)", msg.ascii, "(ascii)" >>>;
-                    true => RECORDING;
-                    // now => recordingStart;
-                    // <<< "RECORDING ON" >>>;
-                    // buf.record(true);
-                    sendRecord(true);
+                    if (msg.key == 44 && !RECORDING) {
+                        true => RECORDING;
+                        // now => recordingStart;
+                        // <<< "RECORDING ON" >>>;
+                        // buf.record(true);
+                        sendRecord(true);
+                    } else if (msg.key == 14) {
+                        // k: pop the topBuf
+                        sendPop();
+                    }
                 } else {
                     if (msg.key == 44 && RECORDING) {
                         false => RECORDING;
@@ -209,6 +214,14 @@ public class GameTrak {
                 }
             }
         }
+    }
+
+
+    fun void sendPop() {
+        chout <= "sending POP" <= " to server: " <= SERVER_IP <= IO.newline();
+        xmit.start("/player/pop");
+        ID => xmit.add;
+        xmit.send();
     }
 
     fun void sendThrow(float angle) {

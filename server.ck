@@ -124,6 +124,7 @@ OscMsg msg;
 oin.addAddress("/player/throw");
 oin.addAddress("/player/catch");
 oin.addAddress("/player/record");
+oin.addAddress("/player/pop");
 
 fun void checkThrow(int sourceID, float angle) {
     0 => int throwSuccess;
@@ -169,6 +170,14 @@ fun void handleRecord(int ID, int toggle) {
     }
 }
 
+fun void handlePop(int ID) {
+    for (int i; i < N; i++) {
+        if (ps[i].ID == ID) {
+            ps[i].popBuf();
+        }
+    }
+}
+
 fun void playerListener() {
     while (true) {
         oin => now;
@@ -198,6 +207,13 @@ fun void playerListener() {
                     // TODO: trigger record ON/OFF
                     handleRecord(ID, toggle);
                     chout <= "record state: " <= ID <= " " <= toggle <= IO.newline();
+                }
+            }
+            if (msg.address == "/player/pop") {
+                if (msg.typetag == "i") {
+                    msg.getInt(0) => int ID;
+                    handlePop(ID);
+                    chout <= "popping buf from: " <= ID <= IO.newline();
                 }
             }
         }
