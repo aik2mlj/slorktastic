@@ -60,6 +60,9 @@ class PlayerState {
     // Blackhole DAC channel
     int dac_channel;
 
+    Dyno lim;
+    lim.limit();
+
     // This is a stack of buffers, whatever on the top get recorded or thrown
     LiSaBuf bufs[MAX_BUFFER];
     // pointer to the top buffer
@@ -70,11 +73,12 @@ class PlayerState {
         id => ID;
         id => adc_channel;
         id + 8 => dac_channel;
+        lim => dac.chan(dac_channel);
 
         // The adc & dac channel now won't change, only that some buffers may disconnect / reconnect
         // to the adc & dac channel
         for (int i; i < MAX_BUFFER; i++) {
-            adc.chan(adc_channel) => bufs[i].lisa => dac.chan(dac_channel);
+            adc.chan(adc_channel) => bufs[i].lisa => lim;
             <<< "Player", id, "buffer", bufs[i] >>>;
         }
     }
@@ -87,13 +91,13 @@ class PlayerState {
 
         // TODO: maybe should check if they are connected already?
         // connect to the adc & dac
-        adc.chan(adc_channel) => bufs[p].lisa => dac.chan(dac_channel);
+        adc.chan(adc_channel) => bufs[p].lisa => lim;
     }
 
     fun void popBuf() {
         // disconnect to the adc & dac
         adc =< bufs[p].lisa;
-        bufs[p].lisa =< dac.chan(dac_channel);
+        bufs[p].lisa =< lim;
 
         (p - 1) % MAX_BUFFER => p;
     }
