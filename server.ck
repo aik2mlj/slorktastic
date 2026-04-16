@@ -85,19 +85,34 @@ class PlayerState {
 
     fun LiSaBuf @topBuf() { return bufs[p]; }
 
-    fun void pushBuf(LiSaBuf @buf) {
+    fun LiSaBuf @pushBuf(LiSaBuf @buf) {
+        // push the buf to the top, and pop the old bottom and return its reference
         (p + 1) % MAX_BUFFER => p;
+
+        bufs[p] @=> LiSaBuf @oldBuf;
+        adc =< oldBuf.lisa;
+        oldBuf.lisa =< lim;
+
         buf @=> bufs[p];
 
         // TODO: maybe should check if they are connected already?
         // connect to the adc & dac
         adc.chan(adc_channel) => bufs[p].lisa => lim;
+
+        return oldBuf;
     }
 
-    fun void popBuf() {
+    fun void popBuf(LiSaBuf @vacantBuf) {
         // disconnect to the adc & dac
         adc =< bufs[p].lisa;
         bufs[p].lisa =< lim;
+
+        // clear the vacantBuf
+        vacantBuf.lisa.clear();
+        vacantBuf.lisa.recPos(0::samp);
+
+        // connect the vacantBuf to the adc & dac
+        adc.chan(adc_channel) => vacantBuf.lisa => lim;
 
         (p - 1) % MAX_BUFFER => p;
     }
@@ -262,8 +277,8 @@ spork ~ playerListener();
 
 
 fun void routeAudio(int sourceID, int targetID) {
-    ps[targetID].pushBuf(ps[sourceID].topBuf());
-    ps[sourceID].popBuf();
+    ps[targetID].pushBuf(ps[sourceID].topBuf()) @=> LiSaBuf @oldBuf;
+    ps[sourceID].popBuf(oldBuf);
 }
 
 
