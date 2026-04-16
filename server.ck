@@ -75,7 +75,7 @@ class PlayerState {
         // to the adc & dac channel
         for (int i; i < MAX_BUFFER; i++) {
             adc.chan(adc_channel) => bufs[i].lisa => dac.chan(dac_channel);
-            <<< "Player " <= id <= " buffer " <= bufs[i];
+            <<< "Player", id, "buffer", bufs[i] >>>;
         }
     }
 
