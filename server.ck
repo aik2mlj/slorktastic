@@ -16,7 +16,7 @@ class LiSaBuf {
     dur recDuration;
 
     10::second => dur MAX_BUFFER_DURATION;
-    8 => int NUM_VOICES;
+    1 => int NUM_VOICES;
     20::ms => dur RAMP_TIME;
 
     MAX_BUFFER_DURATION => lisa.duration;
@@ -157,6 +157,7 @@ fun void handleRecord(int ID, int toggle) {
             if (toggle) {
                 now => buf.recStart;
                 buf.lisa.clear();
+                buf.lisa.recPos(0::samp);
                 chout <= "recording started for player " <= ID <= IO.newline();
                 buf.lisa.record(true);
             } else {
