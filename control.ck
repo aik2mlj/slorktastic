@@ -128,7 +128,7 @@ public class GameTrak {
                     vec2 line_start;
                     vec2 line_end;
 
-                    if (axis[5] < .25)
+                    if (axis[5] < .1)
                         continue;
                     if (throw_angle > 0 && throw_angle < 180) {
                         // Math.map2(start.x, -100, 100, -1.5, 1.5) => line_start.x;
