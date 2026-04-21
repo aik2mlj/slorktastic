@@ -200,7 +200,7 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
         if (ps[i].ID == ID) {
 
             Math.map2(x_pos, -1, 1, 0.0001, 2) => float shift_amt;
-            Math.map2(z_pos, 0, .4, 0, 1.0) => float fx_mix;
+            Math.clamp(Math.map2(z_pos, 0, .4, 0, 1.0), 0, 1.0) => float fx_mix;
             chout <= "current shift: " <= shift_amt <= IO.newline();
 
             Math.map2(y_pos, -1, 1, 1500, 100) => float delay_ms;
@@ -210,7 +210,7 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
                 ps[i].pitchS[j].mix(fx_mix);
                 ps[i].pitchS[j].shift(shift_amt);
 
-                fx_mix => ps[i].echoA[j].mix => ps[i].echoB[j].mix => ps[i].echoC[j].mix;
+                .5 => ps[i].echoA[j].mix => ps[i].echoB[j].mix => ps[i].echoC[j].mix;
                 delay_ms::ms => ps[i].echoA[j].max => ps[i].echoB[j].max => ps[i].echoC[j].max;
                 delay_ms::ms => ps[i].echoA[j].delay => ps[i].echoB[j].delay => ps[i].echoC[j].delay;
             }
