@@ -30,6 +30,10 @@ public class GameTrak {
     float axis[6];
     float velocity[6];
 
+    float x_pos;
+    float y_pos;
+    float z_pos;
+
     0.01 => float DEADZONE;
     .9 => float SMOOTHING_FACTOR;
 
@@ -161,6 +165,15 @@ public class GameTrak {
         }
     }
 
+    fun void continuousControlListener() {
+        while (true) {
+            axis[0] => x_pos;
+            axis[1] => y_pos;
+            axis[2] => z_pos;
+            1::ms => now;
+        }
+    }
+
     false => int RECORDING;
 
     fun void kbListener() {
@@ -224,6 +237,18 @@ public class GameTrak {
         angle => xmit.add;
         xmit.send();
     }
+
+    fun void sendContinuous() {
+        chout <= "sending xyz from ID: " <= ID <= "x: " <= x_pos <= "y: " <= y_pos <= "z: " <=
+            z_pos <= " to server: " <= IO.newline();
+        xmit.start("/player/xyz_pos");
+        ID => xmit.add;
+        x_pos => xmit.add;
+        y_pos => xmit.add;
+        z_pos => xmit.add;
+        xmit.send();
+    }
+
     fun void sendRecord(int toggle) {
         chout <= "sending record signal to server: " <= toggle <= " to server: " <= SERVER_IP <=
             IO.newline();

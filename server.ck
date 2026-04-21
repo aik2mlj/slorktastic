@@ -64,6 +64,14 @@ class PlayerState {
 
     Dyno lim;
     lim.limit();
+    Gain g;
+
+    // effects for continuous control
+    Echo echoA[MAX_BUFFER];
+    Echo echoB[MAX_BUFFER];
+    Echo echoC[MAX_BUFFER];
+    PitShift pitchS[MAX_BUFFER];
+
 
     // This is a stack of buffers, whatever on the top get recorded or thrown
     LiSaBuf bufs[MAX_BUFFER];
@@ -80,7 +88,7 @@ class PlayerState {
         // The adc & dac channel now won't change, only that some buffers may disconnect / reconnect
         // to the adc & dac channel
         for (int i; i < MAX_BUFFER; i++) {
-            adc.chan(adc_channel) => bufs[i].lisa => lim;
+            adc.chan(adc_channel) => bufs[i].lisa => g => echoA[i] => echoB[i] => echoC[i] => pitchS[i] => lim;
             <<< "Player", id, "buffer", bufs[i] >>>;
         }
     }
@@ -93,13 +101,13 @@ class PlayerState {
 
         bufs[p] @=> LiSaBuf @oldBuf;
         adc =< oldBuf.lisa;
-        oldBuf.lisa =< lim;
+        oldBuf.lisa =< g;
 
         buf @=> bufs[p];
 
         // TODO: maybe should check if they are connected already?
         // connect to the adc & dac
-        adc.chan(adc_channel) => bufs[p].lisa => lim;
+        adc.chan(adc_channel) => bufs[p].lisa => g;
 
         return oldBuf;
     }
@@ -107,7 +115,7 @@ class PlayerState {
     fun void popBuf(LiSaBuf @vacantBuf) {
         // disconnect to the adc & dac
         adc =< bufs[p].lisa;
-        bufs[p].lisa =< lim;
+        bufs[p].lisa =< g;
 
         // clear the vacantBuf
         vacantBuf.lisa.clear();
@@ -116,7 +124,7 @@ class PlayerState {
         vacantBuf @=> bufs[p];
 
         // connect the vacantBuf to the adc & dac
-        adc.chan(adc_channel) => bufs[p].lisa => lim;
+        adc.chan(adc_channel) => bufs[p].lisa => g;
 
         (p - 1) % MAX_BUFFER => p;
     }
@@ -156,6 +164,7 @@ OscMsg msg;
 oin.addAddress("/player/throw");
 oin.addAddress("/player/steal");
 oin.addAddress("/player/record");
+oin.addAddress("/player/xyz_pos");
 oin.addAddress("/player/pop");
 
 fun void doThrow(int sourceID, float angle) {
@@ -183,6 +192,28 @@ fun void doSteal(int sourceID, float angle) {
     if (targetID != sourceID) {
         chout <= "player " <= sourceID <= " stole from player " <= targetID <= IO.newline();
         routeAudio(targetID, sourceID);
+    }
+}
+
+fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos) {
+    for (int i; i < N; i++) {
+        if (ps[i].ID == ID) {
+
+            // Pitch shifting
+            ps[i].pitchS[i].mix(x_pos);
+            ps[i].pitchS[i].shift(z_pos);
+
+            // Echo
+            ps[i].echoA[i].mix(.5);
+            ps[i].echoB[i].mix(.5);
+            ps[i].echoC[i].mix(.5);
+            x_pos::second => dur x_dur;
+            y_pos::second => dur y_dur;
+            z_pos::second => dur z_dur;
+            ps[i].echoA[i].delay(x_dur);
+            ps[i].echoB[i].delay(y_dur);
+            ps[i].echoC[i].delay(z_dur);
+        }
     }
 }
 
@@ -258,6 +289,16 @@ fun void playerListener() {
                     msg.getInt(0) => int ID;
                     handlePop(ID);
                     chout <= "player " <= ID <= " popped buf" <= IO.newline();
+                }
+            }
+
+            if (msg.address == "/player/xyz_pos") {
+                if (msg.typetag == "ifff") {
+                    msg.getInt(0) => int ID;
+                    msg.getFloat(1) => float x_pos;
+                    msg.getFloat(2) => float y_pos;
+                    msg.getFloat(3) => float z_pos;
+                    continuousControlListener(ID, x_pos, y_pos, z_pos);
                 }
             }
         }
