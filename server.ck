@@ -200,9 +200,10 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
         if (ps[i].ID == ID) {
 
             // Pitch shifting
-            ps[i].pitchS[i].mix(1.0);
+            ps[i].pitchS[i].effectMix(1.0);
             Math.map2(x_pos, -1, 1, -7, 7) => float shift_amt;
             ps[i].pitchS[i].shift(shift_amt);
+            chout <= "current shift: " <= shift_amt <= IO.newline();
 
             // Echo
             // ps[i].echoA[i].mix(.5);
@@ -212,6 +213,7 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
             .5 => ps[i].echoA[i].mix => ps[i].echoB[i].mix => ps[i].echoC[i].mix;
 
             Math.map2(y_pos, -1, 1, 1500, 100) => float delay_ms;
+            chout <= "current delay: " <= delay_ms <= IO.newline();
 
             delay_ms::ms => ps[i].echoA[i].max => ps[i].echoB[i].max => ps[i].echoC[i].max;
             delay_ms::ms => ps[i].echoA[i].delay => ps[i].echoB[i].delay => ps[i].echoC[i].delay;
@@ -260,7 +262,7 @@ fun void playerListener() {
         oin => now;
 
         while (oin.recv(msg)) {
-            chout <= "received message: " <= msg.address <= IO.newline();
+            // chout <= "received message: " <= msg.address <= IO.newline();
             if (msg.address == "/player/throw") {
                 if (msg.typetag == "if") {
                     msg.getInt(0) => int ID;
