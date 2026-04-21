@@ -200,7 +200,7 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
         if (ps[i].ID == ID) {
 
             // Pitch shifting
-            ps[i].pitchS[i].mix(z_pos);
+            ps[i].pitchS[i].mix(1.0);
             Math.map2(x_pos, -1, 1, -7, 7) => float shift_amt;
             ps[i].pitchS[i].shift(shift_amt);
 
@@ -209,10 +209,11 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
             // ps[i].echoB[i].mix(.5);
             // ps[i].echoC[i].mix(.5);
 
-            z_pos => ps[i].echoA[i].mix => ps[i].echoB[i].mix => ps[i].echoC[i].mix;
+            .5 => ps[i].echoA[i].mix => ps[i].echoB[i].mix => ps[i].echoC[i].mix;
 
             Math.map2(y_pos, -1, 1, 1500, 100) => float delay_ms;
 
+            delay_ms::ms => ps[i].echoA[i].max => ps[i].echoB[i].max => ps[i].echoC[i].max;
             delay_ms::ms => ps[i].echoA[i].delay => ps[i].echoB[i].delay => ps[i].echoC[i].delay;
 
             // x_pos::second => dur x_dur;
