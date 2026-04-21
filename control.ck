@@ -34,22 +34,30 @@ public class GameTrak {
     .9 => float SMOOTHING_FACTOR;
 
     // Set up GameTrak
-    0 => int device;
+    0 => int gt_device;
     // if (me.args())
     //     me.arg(0) => Std.atoi => device;
 
     Hid trak;
-    if (trak.openJoystick(device)) {
+    if (trak.openJoystick(gt_device)) {
         <<< "GameTrak / joystick:", trak.name(), "on" >>>;
     } else {
         <<< "No joystick — use UI" >>>;
     }
 
-    fun GameTrak(int id, string server_ip) {
+    Hid hi;
+    HidMsg msg;
+    int kb_device;
+
+    fun GameTrak(int id, string server_ip, int kb_device) {
         id => ID;
         "Player " + Std.itoa(ID) => ID_text.text;
         server_ip => SERVER_IP;
         xmit.dest(SERVER_IP, 8000);
+
+        if (!hi.openKeyboard(kb_device))
+            me.exit();
+        <<< "keyboard '" + hi.name() + "' ready", "" >>>;
     }
 
     fun void update() {
@@ -139,12 +147,6 @@ public class GameTrak {
             10::ms => now;
         }
     }
-
-    Hid hi;
-    HidMsg msg;
-    if (!hi.openKeyboard(1))
-        me.exit();
-    <<< "keyboard '" + hi.name() + "' ready", "" >>>;
 
     false => int RECORDING;
 
