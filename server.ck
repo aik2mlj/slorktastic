@@ -47,6 +47,8 @@ class LiSaBuf {
                 lisa.rampDown(v, RAMP_TIME);
                 // <<< "RELEASE" >>>;
                 RAMP_TIME => now;
+            } else {
+                100::ms => now;
             }
         }
     }
