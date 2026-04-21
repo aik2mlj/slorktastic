@@ -22,6 +22,7 @@ if (me.args()) {
 GameTrak gt(id, server, kb_device);
 spork ~ gt.update();
 spork ~ gt.throwListener();
+spork ~ gt.continuousControlListener();
 spork ~ gt.kbListener();
 
 while (true) {

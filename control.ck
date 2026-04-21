@@ -170,7 +170,8 @@ public class GameTrak {
             axis[0] => x_pos;
             axis[1] => y_pos;
             axis[2] => z_pos;
-            1::ms => now;
+            sendContinuous();
+            50::ms => now;
         }
     }
 
