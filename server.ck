@@ -88,7 +88,7 @@ class PlayerState {
         // The adc & dac channel now won't change, only that some buffers may disconnect / reconnect
         // to the adc & dac channel
         for (int i; i < MAX_BUFFER; i++) {
-            adc.chan(adc_channel) => bufs[i].lisa => g => pitchS[i] => echoA[i] => echoB[i] => echoC[i] => lim;
+            adc.chan(adc_channel) => bufs[i].lisa => g => echoA[i] => echoB[i] => echoC[i] => pitchS[i] => lim;
             <<< "Player", id, "buffer", bufs[i] >>>;
         }
     }
