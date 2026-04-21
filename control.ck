@@ -15,12 +15,6 @@ public class GameTrak {
     int throwing;
     float throw_angle;
 
-    GText catch_text --> GG.scene();
-    "" => catch_text.text;
-    catch_text.color(@(1, 1, 1));
-    catch_text.size(.5);
-    catch_text.posY(-1.5);
-
     GText ID_text --> GG.scene();
     "Player " + Std.itoa(ID) => ID_text.text;
     ID_text.color(@(1, 1, 1));
@@ -146,32 +140,6 @@ public class GameTrak {
         }
     }
 
-    false => int catchReady;
-
-    fun void catchListener() {
-        while (true) {
-            Math.fabs(axis[2] - axis[5]) => float catch_diff;
-            .1 => float diff_threshold;
-
-            // chout <= "catch diff: " <= catch_diff <= IO.newline();
-
-            if (catch_diff < diff_threshold && axis[2] > .3 && axis[5] > .3) {
-                if (!catchReady) {
-                    true => catchReady;
-                    "CATCH READY" => catch_text.text;
-                    sendCatch(catchReady);
-                }
-            } else {
-                if (catchReady) {
-                    false => catchReady;
-                    "" => catch_text.text;
-                    sendCatch(catchReady);
-                }
-            }
-            10::ms => now;
-        }
-    }
-
     Hid hi;
     HidMsg msg;
     if (!hi.openKeyboard(1))
@@ -230,15 +198,6 @@ public class GameTrak {
         xmit.start("/player/throw");
         ID => xmit.add;
         angle => xmit.add;
-        xmit.send();
-    }
-
-    fun void sendCatch(int ready) {
-        chout <= "sending catch with ID: " <= ID <= " ready: " <= ready <= " to server: " <=
-            SERVER_IP <= IO.newline();
-        xmit.start("/player/catch");
-        ID => xmit.add;
-        ready => xmit.add;
         xmit.send();
     }
 

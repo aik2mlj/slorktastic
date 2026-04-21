@@ -55,8 +55,6 @@ class LiSaBuf {
 class PlayerState {
     // Player ID, 0-indexed
     int ID;
-    // Whether the player is ready to catch
-    int catchReady;
     // Which ADC channel the player is on
     int adc_channel;
     // Blackhole DAC channel
@@ -154,29 +152,18 @@ OscMsg msg;
 8000 => oin.port;
 
 oin.addAddress("/player/throw");
-oin.addAddress("/player/catch");
 oin.addAddress("/player/record");
 oin.addAddress("/player/pop");
 
-fun void checkThrow(int sourceID, float angle) {
-    0 => int throwSuccess;
+fun void doThrow(int sourceID, float angle) {
     int targetID;
-
 
     360 / N => float theta;
     ((2 * angle) / theta) - 1 => float targetPOV;
     (sourceID + Math.round(targetPOV + 1) $ int) % N => targetID;
 
-    for (int i; i < N; i++) {
-        if (ps[i].ID == targetID && ps[i].catchReady) {
-            // ps[i] is the player we are throwing to
-            1 => throwSuccess;
-        }
-    }
-
-    if (throwSuccess && targetID != sourceID) {
-        chout <= "player " <= targetID <= " successfuly caught the throw from player " <=
-            sourceID <= IO.newline();
+    if (targetID != sourceID) {
+        chout <= "player " <= sourceID <= " threw to player " <= targetID <= IO.newline();
         routeAudio(sourceID, targetID);
     }
 }
@@ -221,15 +208,7 @@ fun void playerListener() {
                     msg.getInt(0) => int ID;
                     msg.getFloat(1) => float angle;
                     chout <= "throw from player: " <= ID <= " at angle " <= angle <= IO.newline();
-                    checkThrow(ID, angle);
-                }
-            }
-            if (msg.address == "/player/catch") {
-                if (msg.typetag == "ii") {
-                    msg.getInt(0) => int ID;
-                    msg.getInt(1) => int ready;
-                    ready => ps[ID].catchReady;
-                    chout <= "catch state: " <= ID <= " " <= ready <= IO.newline();
+                    doThrow(ID, angle);
                 }
             }
             if (msg.address == "/player/record") {
