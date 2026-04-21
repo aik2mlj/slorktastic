@@ -88,7 +88,7 @@ class PlayerState {
         // The adc & dac channel now won't change, only that some buffers may disconnect / reconnect
         // to the adc & dac channel
         for (int i; i < MAX_BUFFER; i++) {
-            adc.chan(adc_channel) => bufs[i].lisa => g => pitchS[i] => echoA[i] => echoB[i] => echoC[i] => lim;
+            adc.chan(adc_channel) => bufs[i].lisa => g => pitchS[i] => lim;
             <<< "Player", id, "buffer", bufs[i] >>>;
         }
     }
@@ -200,7 +200,7 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
         if (ps[i].ID == ID) {
 
             // Pitch shifting
-            ps[i].pitchS[i].effectMix(1.0);
+            // ps[i].pitchS[i].effectMix(1.0);
             ps[i].pitchS[i].mix(1.0);
             Math.map2(x_pos, -1, 1, -7, 7) => float shift_amt;
             ps[i].pitchS[i].shift(shift_amt);
