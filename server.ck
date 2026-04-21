@@ -199,32 +199,20 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
     for (int i; i < N; i++) {
         if (ps[i].ID == ID) {
 
-            // Pitch shifting
-            // ps[i].pitchS[i].effectMix(1.0);
-            ps[i].pitchS[i].mix(1.0);
-            Math.map2(x_pos, -1, 1, -7, 7) => float shift_amt;
-            ps[i].pitchS[i].shift(shift_amt);
+            Math.map2(x_pos, -1, 1, -1.5, 1.5) => float shift_amt;
             chout <= "current shift: " <= shift_amt <= IO.newline();
-
-            // Echo
-            // ps[i].echoA[i].mix(.5);
-            // ps[i].echoB[i].mix(.5);
-            // ps[i].echoC[i].mix(.5);
-
-            .5 => ps[i].echoA[i].mix => ps[i].echoB[i].mix => ps[i].echoC[i].mix;
 
             Math.map2(y_pos, -1, 1, 1500, 100) => float delay_ms;
             chout <= "current delay: " <= delay_ms <= IO.newline();
 
-            delay_ms::ms => ps[i].echoA[i].max => ps[i].echoB[i].max => ps[i].echoC[i].max;
-            delay_ms::ms => ps[i].echoA[i].delay => ps[i].echoB[i].delay => ps[i].echoC[i].delay;
+            for (int j; j < MAX_BUFFER; j++) {
+                ps[i].pitchS[j].mix(1.0);
+                ps[i].pitchS[j].shift(shift_amt);
 
-            // x_pos::second => dur x_dur;
-            // y_pos::second => dur y_dur;
-            // z_pos::second => dur z_dur;
-            // ps[i].echoA[i].delay(x_dur);
-            // ps[i].echoB[i].delay(y_dur);
-            // ps[i].echoC[i].delay(z_dur);
+                .5 => ps[i].echoA[j].mix => ps[i].echoB[j].mix => ps[i].echoC[j].mix;
+                delay_ms::ms => ps[i].echoA[j].max => ps[i].echoB[j].max => ps[i].echoC[j].max;
+                delay_ms::ms => ps[i].echoA[j].delay => ps[i].echoB[j].delay => ps[i].echoC[j].delay;
+            }
         }
     }
 }
