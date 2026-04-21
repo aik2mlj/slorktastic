@@ -17,7 +17,7 @@ class LiSaBuf {
 
     10::second => dur MAX_BUFFER_DURATION;
     1 => int NUM_VOICES;
-    20::ms => dur RAMP_TIME;
+    200::ms => dur RAMP_TIME;
 
     MAX_BUFFER_DURATION => lisa.duration;
     NUM_VOICES => lisa.maxVoices;
@@ -26,26 +26,28 @@ class LiSaBuf {
     fun void playLoop() {
         while (true) {
             // <<< "Current recording duration: ", recDuration >>>;
-            lisa.getVoice() => int v;
-            if (v < 0)
-                return;
+            if (recDuration >= 2 * RAMP_TIME) {
+                lisa.getVoice() => int v;
+                if (v < 0)
+                    return;
 
-            lisa.voiceGain(v, .5);
-            lisa.rate(v, 1.0);
-            lisa.loop(v, 1);
+                lisa.voiceGain(v, .5);
+                lisa.rate(v, 1.0);
+                lisa.loop(v, 1);
 
-            // <<< "ATTACK" >>>;
-            lisa.playPos(v, 0::samp);
+                // <<< "ATTACK" >>>;
+                lisa.playPos(v, 0::samp);
 
-            lisa.rampUp(v, RAMP_TIME);
-            RAMP_TIME => now;
+                lisa.rampUp(v, RAMP_TIME);
+                RAMP_TIME => now;
 
-            // <<< "SUSTAIN" >>>;
-            recDuration => now;
+                // <<< "SUSTAIN" >>>;
+                recDuration - 2 * RAMP_TIME => now;
 
-            lisa.rampDown(v, RAMP_TIME);
-            // <<< "RELEASE" >>>;
-            RAMP_TIME => now;
+                lisa.rampDown(v, RAMP_TIME);
+                // <<< "RELEASE" >>>;
+                RAMP_TIME => now;
+            }
         }
     }
 }
