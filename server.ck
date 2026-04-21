@@ -1,3 +1,5 @@
+@import "quantize.ck"
+
 // Initialize player states
 //----------------------------------------------------------------------------
 // number of players
@@ -9,11 +11,13 @@ if (me.args()) {
 }
 
 PlayerState ps[N];
+QuantizeStatus qtStatus;
 
 class LiSaBuf {
     LiSa lisa;
     time recStart;
     dur recDuration;
+    dur qtDuration;
 
     10::second => dur MAX_BUFFER_DURATION;
     1 => int NUM_VOICES;
@@ -23,10 +27,19 @@ class LiSaBuf {
     NUM_VOICES => lisa.maxVoices;
     RAMP_TIME => lisa.recRamp;
 
+    fun void setQuantize() { qtStatus.getQuantizedDur(recDuration) => qtDuration; }
+
     fun void playLoop() {
         while (true) {
-            // <<< "Current recording duration: ", recDuration >>>;
-            if (recDuration >= 2 * RAMP_TIME) {
+            // determine using quantized or original recorded duration
+            // WARNING: we are using the global qtStatus, might not be the best
+            dur d;
+            if (qtStatus.on)
+                qtDuration => d;
+            else
+                recDuration => d;
+
+            if (d >= 2 * RAMP_TIME) {
                 lisa.getVoice() => int v;
                 if (v < 0)
                     return;
@@ -42,7 +55,7 @@ class LiSaBuf {
                 RAMP_TIME => now;
 
                 // <<< "SUSTAIN" >>>;
-                recDuration - 2 * RAMP_TIME => now;
+                d - 2 * RAMP_TIME => now;
 
                 lisa.rampDown(v, RAMP_TIME);
                 // <<< "RELEASE" >>>;
@@ -170,6 +183,7 @@ oin.addAddress("/player/steal");
 oin.addAddress("/player/record");
 oin.addAddress("/player/xyz_pos");
 oin.addAddress("/player/pop");
+oin.addAddress("/player/quantize");
 
 fun void doThrow(int sourceID, float angle) {
     int targetID;
@@ -249,6 +263,22 @@ fun void handlePop(int ID) {
     }
 }
 
+fun void handleQuantize(int quantize, float loopDur) {
+    if (quantize && !qtStatus.on) {
+        // quantize turn on
+        qtStatus.setOn(loopDur);
+        // set the quantize duration for each buffer
+        for (int i; i < N; i++) {
+            for (int j; j < MAX_BUFFER; j++) {
+                ps[i].bufs[j].setQuantize();
+            }
+        }
+    } else if (!quantize && qtStatus.on) {
+        // quantize turn off
+        qtStatus.setOff();
+    }
+}
+
 fun void playerListener() {
     while (true) {
         oin => now;
@@ -302,6 +332,15 @@ fun void playerListener() {
                     msg.getFloat(2) => float y_pos;
                     msg.getFloat(3) => float z_pos;
                     continuousControlListener(ID, x_pos, y_pos, z_pos);
+                    chout <= "popping buf from: " <= ID <= IO.newline();
+                }
+            }
+
+            if (msg.address == "/player/quantize") {
+                if (msg.typetag == "if") {
+                    msg.getInt(0) => int quantize;
+                    msg.getFloat(1) => float loopDur;
+                    handleQuantize(quantize, loopDur);
                 }
             }
         }
