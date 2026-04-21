@@ -88,7 +88,7 @@ class PlayerState {
         // The adc & dac channel now won't change, only that some buffers may disconnect / reconnect
         // to the adc & dac channel
         for (int i; i < MAX_BUFFER; i++) {
-            adc.chan(adc_channel) => bufs[i].lisa => g => pitchS[i] => lim;
+            adc.chan(adc_channel) => bufs[i].lisa => g => pitchS[i] => echoA[i] => echoB[i] => echoC[i] => lim;
             <<< "Player", id, "buffer", bufs[i] >>>;
         }
     }
@@ -199,17 +199,18 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
     for (int i; i < N; i++) {
         if (ps[i].ID == ID) {
 
-            Math.map2(x_pos, -1, 1, -1.5, 1.5) => float shift_amt;
+            Math.map2(x_pos, -1, 1, 0.0001, 2) => float shift_amt;
+            Math.map2(z_pos, 0, .4, 0, 1.0) => float fx_mix;
             chout <= "current shift: " <= shift_amt <= IO.newline();
 
             Math.map2(y_pos, -1, 1, 1500, 100) => float delay_ms;
             chout <= "current delay: " <= delay_ms <= IO.newline();
 
             for (int j; j < MAX_BUFFER; j++) {
-                ps[i].pitchS[j].mix(1.0);
+                ps[i].pitchS[j].mix(fx_mix);
                 ps[i].pitchS[j].shift(shift_amt);
 
-                .5 => ps[i].echoA[j].mix => ps[i].echoB[j].mix => ps[i].echoC[j].mix;
+                fx_mix => ps[i].echoA[j].mix => ps[i].echoB[j].mix => ps[i].echoC[j].mix;
                 delay_ms::ms => ps[i].echoA[j].max => ps[i].echoB[j].max => ps[i].echoC[j].max;
                 delay_ms::ms => ps[i].echoA[j].delay => ps[i].echoB[j].delay => ps[i].echoC[j].delay;
             }
