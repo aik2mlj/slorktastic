@@ -90,6 +90,7 @@ class PlayerState {
         for (int i; i < MAX_BUFFER; i++) {
             adc.chan(adc_channel) => bufs[i].lisa => g => pitchS[i] => echoA[i] => echoB[i] => echoC[i] => lim;
             .5 => pitchS[i].mix => echoA[i].mix => echoB[i].mix => echoC[i].mix;
+            4000::ms => echoA[i].delay => echoB[i].delay => echoC[i].delay;
             <<< "Player", id, "buffer", bufs[i] >>>;
         }
     }
@@ -204,7 +205,7 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
             Math.clampf(Math.map2(z_pos, 0, .4, 0, 1.0), 0, 1.0) => float fx_mix;
             chout <= "current shift: " <= shift_amt <= IO.newline();
 
-            Math.map2(y_pos, -1, 1, 1500, 100) => float delay_ms;
+            Math.map2(y_pos, -1, 1, 3000, 800) => float delay_ms;
             chout <= "current delay: " <= delay_ms <= IO.newline();
 
             for (int j; j < MAX_BUFFER; j++) {
