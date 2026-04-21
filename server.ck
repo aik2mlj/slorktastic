@@ -154,6 +154,7 @@ OscMsg msg;
 8000 => oin.port;
 
 oin.addAddress("/player/throw");
+oin.addAddress("/player/steal");
 oin.addAddress("/player/record");
 oin.addAddress("/player/pop");
 
@@ -167,6 +168,21 @@ fun void doThrow(int sourceID, float angle) {
     if (targetID != sourceID) {
         chout <= "player " <= sourceID <= " threw to player " <= targetID <= IO.newline();
         routeAudio(sourceID, targetID);
+    }
+}
+
+fun void doSteal(int sourceID, float angle) {
+    int targetID;
+
+    (angle + 180) % 360 => float targetAngle;
+
+    360 / N => float theta;
+    ((2 * targetAngle) / theta) - 1 => float targetPOV;
+    (sourceID + Math.round(targetPOV + 1) $ int) % N => targetID;
+
+    if (targetID != sourceID) {
+        chout <= "player " <= sourceID <= " stole from player " <= targetID <= IO.newline();
+        routeAudio(targetID, sourceID);
     }
 }
 
@@ -209,8 +225,18 @@ fun void playerListener() {
                 if (msg.typetag == "if") {
                     msg.getInt(0) => int ID;
                     msg.getFloat(1) => float angle;
-                    chout <= "throw from player: " <= ID <= " at angle " <= angle <= IO.newline();
+                    chout <= "throw attempt by player: " <= ID <= " with angle " <= angle <=
+                        IO.newline();
                     doThrow(ID, angle);
+                }
+            }
+            if (msg.address == "/player/steal") {
+                if (msg.typetag == "if") {
+                    msg.getInt(0) => int ID;
+                    msg.getFloat(1) => float angle;
+                    chout <= "steal attempt by player: " <= ID <= " with angle " <= angle <=
+                        IO.newline();
+                    doSteal(ID, angle);
                 }
             }
             if (msg.address == "/player/record") {
@@ -219,14 +245,19 @@ fun void playerListener() {
                     msg.getInt(1) => int toggle;
                     // TODO: trigger record ON/OFF
                     handleRecord(ID, toggle);
-                    chout <= "record state: " <= ID <= " " <= toggle <= IO.newline();
+                    string recordState;
+                    if (toggle)
+                        "ON" => recordState;
+                    else
+                        "OFF" => recordState;
+                    chout <= "player " <= ID <= " recording state: " <= recordState <= IO.newline();
                 }
             }
             if (msg.address == "/player/pop") {
                 if (msg.typetag == "i") {
                     msg.getInt(0) => int ID;
                     handlePop(ID);
-                    chout <= "popping buf from: " <= ID <= IO.newline();
+                    chout <= "player " <= ID <= " popped buf" <= IO.newline();
                 }
             }
         }

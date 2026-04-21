@@ -128,22 +128,35 @@ public class GameTrak {
                     vec2 line_start;
                     vec2 line_end;
 
-                    if (axis[5] > .25 && throw_angle > 0 && throw_angle < 180) {
+                    if (axis[5] < .25)
+                        continue;
+                    if (throw_angle > 0 && throw_angle < 180) {
                         // Math.map2(start.x, -100, 100, -1.5, 1.5) => line_start.x;
                         // Math.map2(start.y, -100, 100, -1.5, 1.5) => line_start.y;
                         Math.map2(end.x, -100, 100, -2, 2) => line_end.x;
                         Math.map2(end.y, -100, 100, -2, 2) => line_end.y;
                         [line_start, line_end] => line.positions;
+                        @(0, 0, 1) => line.color;
                         chout <= "throwing with angle: " <= throw_angle <= IO.newline();
                         <<< start.x, start.y, end.x, end.y >>>;
                         sendThrow(throw_angle);
 
                         0.5::second => now;
+                    } else {
+                        // Math.map2(start.x, -100, 100, -1.5, 1.5) => line_start.x;
+                        // Math.map2(start.y, -100, 100, -1.5, 1.5) => line_start.y;
+                        Math.map2(end.x, -100, 100, -2, 2) => line_end.x;
+                        Math.map2(end.y, -100, 100, -2, 2) => line_end.y;
+                        [line_start, line_end] => line.positions;
+                        @(1, 0, 0) => line.color;
+                        chout <= "stealing with angle: " <= throw_angle <= IO.newline();
+                        <<< start.x, start.y, end.x, end.y >>>;
+                        sendSteal(throw_angle);
+
+                        0.5::second => now;
                     }
                 }
             }
-            // chout <= "velocity: " <= "x = " <= velocity[3] <= " y = " <=
-            // velocity[4] <= " z = " <= velocity[5] <= IO.newline();
             10::ms => now;
         }
     }
@@ -203,6 +216,14 @@ public class GameTrak {
         xmit.send();
     }
 
+    fun void sendSteal(float angle) {
+        chout <= "sending steal with angle: " <= angle <= " to server: " <= SERVER_IP <=
+            IO.newline();
+        xmit.start("/player/steal");
+        ID => xmit.add;
+        angle => xmit.add;
+        xmit.send();
+    }
     fun void sendRecord(int toggle) {
         chout <= "sending record signal to server: " <= toggle <= " to server: " <= SERVER_IP <=
             IO.newline();
