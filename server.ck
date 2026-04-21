@@ -52,6 +52,12 @@ class LiSaBuf {
             }
         }
     }
+
+    fun void clear() {
+        lisa.clear();
+        lisa.recPos(0::samp);
+        0::samp => recDuration;
+    }
 }
 
 class PlayerState {
@@ -118,8 +124,7 @@ class PlayerState {
         bufs[p].lisa =< g;
 
         // clear the vacantBuf
-        vacantBuf.lisa.clear();
-        vacantBuf.lisa.recPos(0::samp);
+        vacantBuf.clear();
 
         vacantBuf @=> bufs[p];
 
@@ -132,8 +137,7 @@ class PlayerState {
     fun void popSelf() {
         // this is different from popBuf that we don't need to disconnect the pipeline
         // just clear the lisa buffer and rotate the pointer
-        bufs[p].lisa.clear();
-        bufs[p].lisa.recPos(0::samp);
+        bufs[p].clear();
 
         (p - 1) % MAX_BUFFER => p;
     }
@@ -225,8 +229,7 @@ fun void handleRecord(int ID, int toggle) {
 
             if (toggle) {
                 now => buf.recStart;
-                buf.lisa.clear();
-                buf.lisa.recPos(0::samp);
+                buf.clear();
                 chout <= "recording started for player " <= ID <= IO.newline();
                 buf.lisa.record(true);
             } else {
