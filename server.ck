@@ -90,7 +90,7 @@ class PlayerState {
         for (int i; i < MAX_BUFFER; i++) {
             adc.chan(adc_channel) => bufs[i].lisa => g => pitchS[i] => echoA[i] => echoB[i] => echoC[i] => lim;
             .5 => pitchS[i].mix => echoA[i].mix => echoB[i].mix => echoC[i].mix;
-            4000::ms => echoA[i].delay => echoB[i].delay => echoC[i].delay;
+            4000::ms => echoA[i].max => echoB[i].max => echoC[i].max;
             <<< "Player", id, "buffer", bufs[i] >>>;
         }
     }
