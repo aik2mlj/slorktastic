@@ -64,13 +64,15 @@ class PlayerState {
 
     Dyno lim;
     lim.limit();
-    Gain g;
+    Gain preFX;
 
     // effects for continuous control
     Echo echoA[MAX_BUFFER];
     Echo echoB[MAX_BUFFER];
     Echo echoC[MAX_BUFFER];
     PitShift pitchS[MAX_BUFFER];
+    DelayL delayL[MAX_BUFFER];
+    Gain postFX;
 
 
     // This is a stack of buffers, whatever on the top get recorded or thrown
@@ -87,10 +89,13 @@ class PlayerState {
 
         // The adc & dac channel now won't change, only that some buffers may disconnect / reconnect
         // to the adc & dac channel
+        postFX => lim;
         for (int i; i < MAX_BUFFER; i++) {
-            adc.chan(adc_channel) => bufs[i].lisa => g => pitchS[i] => echoA[i] => echoB[i] => echoC[i] => lim;
-            .5 => pitchS[i].mix => echoA[i].mix => echoB[i].mix => echoC[i].mix;
-            4000::ms => echoA[i].max => echoB[i].max => echoC[i].max;
+            adc.chan(adc_channel) => bufs[i].lisa => preFX => pitchS[i] => postFX => delayL[i] => postFX;
+            delayL[i].gain(.95);
+            delayL[i].delay(1000::ms);
+            // .5 => pitchS[i].mix => echoA[i].mix => echoB[i].mix => echoC[i].mix;
+            // 4000::ms => echoA[i].max => echoB[i].max => echoC[i].max;
             <<< "Player", id, "buffer", bufs[i] >>>;
         }
     }
@@ -103,13 +108,13 @@ class PlayerState {
 
         bufs[p] @=> LiSaBuf @oldBuf;
         adc =< oldBuf.lisa;
-        oldBuf.lisa =< g;
+        oldBuf.lisa =< preFX;
 
         buf @=> bufs[p];
 
         // TODO: maybe should check if they are connected already?
         // connect to the adc & dac
-        adc.chan(adc_channel) => bufs[p].lisa => g;
+        adc.chan(adc_channel) => bufs[p].lisa => preFX;
 
         return oldBuf;
     }
@@ -117,7 +122,7 @@ class PlayerState {
     fun void popBuf(LiSaBuf @vacantBuf) {
         // disconnect to the adc & dac
         adc =< bufs[p].lisa;
-        bufs[p].lisa =< g;
+        bufs[p].lisa =< preFX;
 
         // clear the vacantBuf
         vacantBuf.lisa.clear();
@@ -126,7 +131,7 @@ class PlayerState {
         vacantBuf @=> bufs[p];
 
         // connect the vacantBuf to the adc & dac
-        adc.chan(adc_channel) => bufs[p].lisa => g;
+        adc.chan(adc_channel) => bufs[p].lisa => preFX;
 
         (p - 1) % MAX_BUFFER => p;
     }
@@ -212,7 +217,9 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
                 ps[i].pitchS[j].mix(fx_mix);
                 ps[i].pitchS[j].shift(shift_amt);
 
-                delay_ms::ms => ps[i].echoA[j].delay => ps[i].echoB[j].delay => ps[i].echoC[j].delay;
+                // delay_ms::ms => ps[i].echoA[j].delay => ps[i].echoB[j].delay =>
+                // ps[i].echoC[j].delay;
+                delay_ms::ms => ps[i].delayL[j].delay;
                 // delay_ms::ms => ps[i].echoA[j].delay => ps[i].echoB[j].delay =>
                 // ps[i].echoC[j].delay;
             }
