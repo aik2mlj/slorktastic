@@ -93,7 +93,7 @@ class PlayerState {
         for (int i; i < MAX_BUFFER; i++) {
             adc.chan(adc_channel) => bufs[i].lisa => preFX => pitchS[i] => postFX => delayL[i] => postFX;
             delayL[i].gain(.95);
-            delayL[i].delay(1000::ms);
+            1000::ms => delayL[i].max => delayL[i].delay;
             // .5 => pitchS[i].mix => echoA[i].mix => echoB[i].mix => echoC[i].mix;
             // 4000::ms => echoA[i].max => echoB[i].max => echoC[i].max;
             <<< "Player", id, "buffer", bufs[i] >>>;
@@ -219,7 +219,7 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
 
                 // delay_ms::ms => ps[i].echoA[j].delay => ps[i].echoB[j].delay =>
                 // ps[i].echoC[j].delay;
-                delay_ms::ms => ps[i].delayL[j].delay;
+                delay_ms::ms => ps[i].delayL[j].max => ps[i].delayL[j].delay;
                 // delay_ms::ms => ps[i].echoA[j].delay => ps[i].echoB[j].delay =>
                 // ps[i].echoC[j].delay;
             }
