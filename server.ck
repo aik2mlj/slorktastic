@@ -214,7 +214,7 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
             // Math.map2(y_pos, -1, 1, 3000, 800) => float delay_ms;
             // chout <= "current delay: " <= delay_ms <= IO.newline();
 
-            Math.map2(y_pos, -1, 1, 1, .25) => float intervalScaling;
+            Math.map2(y_pos, -1, 1, 1.25, .7) => float intervalScaling;
             chout <= "current interval scaling: " <= intervalScaling <= IO.newline();
 
             for (int j; j < MAX_BUFFER; j++) {
