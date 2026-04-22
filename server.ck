@@ -227,7 +227,7 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
                 ps[i].pitchS[j].mix(fx_mix);
                 ps[i].pitchS[j].shift(shift_amt);
 
-                ps[i].pRev.mix(plinky_amt);
+                ps[i].pRev.mix(fx_mix);
                 ps[i].pRev.shim(plinky_amt);
                 ps[i].pRev.wobble(plinky_amt);
 
