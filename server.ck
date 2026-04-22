@@ -1,3 +1,4 @@
+@import "PlinkyRev"
 // Initialize player states
 //----------------------------------------------------------------------------
 // number of players
@@ -76,6 +77,9 @@ class PlayerState {
     DelayL delayL[MAX_BUFFER];
     Gain postFX;
 
+    PlinkyRev pRev;
+    pRev.mix(0.5);
+
 
     // This is a stack of buffers, whatever on the top get recorded or thrown
     LiSaBuf bufs[MAX_BUFFER];
@@ -93,7 +97,7 @@ class PlayerState {
         // to the adc & dac channel
         postFX => lim;
         for (int i; i < MAX_BUFFER; i++) {
-            adc.chan(adc_channel) => bufs[i].lisa => preFX => pitchS[i] => postFX;
+            adc.chan(adc_channel) => bufs[i].lisa => preFX => pitchS[i] => pRev => postFX;
             // delayL[i].gain(.99);
             // 4000::ms => delayL[i].max => delayL[i].delay;
             // .5 => pitchS[i].mix => echoA[i].mix => echoB[i].mix => echoC[i].mix;
@@ -215,12 +219,17 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
             // Math.map2(y_pos, -1, 1, 3000, 800) => float delay_ms;
             // chout <= "current delay: " <= delay_ms <= IO.newline();
 
-            Math.map2(x_pos, -1, 1, .5, 2.0) => float rateScaling;
+            // Math.map2(x_pos, -1, 1, .8, 4.0) => float rateScaling;
             // chout <= "current interval scaling: " <= intervalScaling <= IO.newline();
+            Math.map2(y_pos, -1, 1, 0.0, 1.0) => float plinky_amt;
 
             for (int j; j < MAX_BUFFER; j++) {
-                ps[i].pitchS[j].mix(0);
-                // ps[i].pitchS[j].shift(shift_amt);
+                ps[i].pitchS[j].mix(fx_mix);
+                ps[i].pitchS[j].shift(shift_amt);
+
+                ps[i].pRev.mix(plinky_amt);
+                ps[i].pRev.shim(plinky_amt);
+                ps[i].pRev.wobble(plinky_amt);
 
                 // delay_ms::ms => ps[i].echoA[j].delay => ps[i].echoB[j].delay =>
                 // ps[i].echoC[j].delay;
@@ -229,7 +238,7 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
 
                 // intervalScaling => ps[i].bufs[j].durationScalingFactor;
 
-                rateScaling => ps[i].bufs[j].playbackRate;
+                // rateScaling => ps[i].bufs[j].playbackRate;
             }
         }
     }
