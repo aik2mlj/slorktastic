@@ -27,6 +27,7 @@ class LiSaBuf {
     NUM_VOICES => lisa.maxVoices;
     RAMP_TIME => lisa.recRamp;
 
+    // WARNING: we are using the global qtStatus, might not be the best
     fun void setQuantize() { qtStatus.getQuantizedDur(recDuration) => qtDuration; }
 
     fun void playLoop() {
@@ -263,17 +264,17 @@ fun void handlePop(int ID) {
     }
 }
 
-fun void handleQuantize(int quantize, float loopDur) {
-    if (quantize && !qtStatus.on) {
+fun void handleQuantize() {
+    if (!qtStatus.on) {
         // quantize turn on
-        qtStatus.setOn(loopDur);
+        qtStatus.setOn();
         // set the quantize duration for each buffer
         for (int i; i < N; i++) {
             for (int j; j < MAX_BUFFER; j++) {
                 ps[i].bufs[j].setQuantize();
             }
         }
-    } else if (!quantize && qtStatus.on) {
+    } else if (qtStatus.on) {
         // quantize turn off
         qtStatus.setOff();
     }
@@ -337,10 +338,9 @@ fun void playerListener() {
             }
 
             if (msg.address == "/player/quantize") {
-                if (msg.typetag == "if") {
-                    msg.getInt(0) => int quantize;
-                    msg.getFloat(1) => float loopDur;
-                    handleQuantize(quantize, loopDur);
+                if (msg.typetag == "i") {
+                    // msg.getInt(0) => int quantize;
+                    handleQuantize();
                 }
             }
         }

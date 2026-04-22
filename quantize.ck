@@ -1,15 +1,42 @@
 public class QuantizeStatus {
-    dur loopDur;
-    int on;
-    float allowedMeters[] = [1 / 4, 1 / 3];
+    // default value of loopDur
+    2::second => dur DEFAULT_LOOPDUR;
 
-    fun void init(dur d) { d => loopDur; }
+    dur loopDur;
+    0 => int on;
+    float allowedMeters[] = [1 / 4];
+
+    SndBuf kick;
+    me.dir() + "audio/kick.wav" => kick.read;
+    0 => kick.gain;
+
+    // connect to every channel
+    for (int i; i < dac.channels(); i++) {
+        kick => dac.chan(i);
+    }
+
+    fun void setOn() { setOn(DEFAULT_LOOPDUR); }
 
     fun void setOn(dur d) {
         1 => on;
         d => loopDur;
+        0.5 => kick.gain;
     }
-    fun void setOff() { 0 => on; }
+    fun void setOff() {
+        0 => on;
+        0 => kick.gain;
+    }
+
+    fun void playKickLoop() {
+        while (true) {
+            if (on) {
+                0 => kick.pos;
+                loopDur => now;
+            } else {
+                100::ms => now;
+            }
+        }
+    }
 
     fun dur getQuantizedDur(dur d) {
         if (d == 0::samp)
