@@ -15,6 +15,7 @@ class LiSaBuf {
     time recStart;
     dur recDuration;
     float durationScalingFactor;
+    1.0 => float playbackRate;
 
     10::second => dur MAX_BUFFER_DURATION;
     1 => int NUM_VOICES;
@@ -33,7 +34,7 @@ class LiSaBuf {
                     return;
 
                 lisa.voiceGain(v, .5);
-                lisa.rate(v, 1.0);
+                lisa.rate(v, playbackRate);
                 lisa.loop(v, 1);
 
                 // <<< "ATTACK" >>>;
@@ -43,7 +44,7 @@ class LiSaBuf {
                 RAMP_TIME => now;
 
                 // <<< "SUSTAIN" >>>;
-                (recDuration - 2 * RAMP_TIME) * durationScalingFactor => now;
+                (recDuration - 2 * RAMP_TIME) * 1.0 => now;
 
                 lisa.rampDown(v, RAMP_TIME);
                 // <<< "RELEASE" >>>;
@@ -214,8 +215,8 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
             // Math.map2(y_pos, -1, 1, 3000, 800) => float delay_ms;
             // chout <= "current delay: " <= delay_ms <= IO.newline();
 
-            Math.map2(y_pos, -1, 1, 1.25, .7) => float intervalScaling;
-            chout <= "current interval scaling: " <= intervalScaling <= IO.newline();
+            Math.map2(y_pos, -1, 1, .25, 2.0) => float rateScaling;
+            // chout <= "current interval scaling: " <= intervalScaling <= IO.newline();
 
             for (int j; j < MAX_BUFFER; j++) {
                 ps[i].pitchS[j].mix(fx_mix);
@@ -226,7 +227,9 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
                 // delay_ms::ms => ps[i].delayL[j].max => ps[i].delayL[j].delay;
                 // delay_ms::ms => ps[i].echoA[j].delay => ps[i].echoB[j].delay =>
 
-                intervalScaling => ps[i].bufs[j].durationScalingFactor;
+                // intervalScaling => ps[i].bufs[j].durationScalingFactor;
+
+                rateScaling => ps[i].bufs[j].playbackRate;
             }
         }
     }
