@@ -77,8 +77,10 @@ class PlayerState {
     DelayL delayL[MAX_BUFFER];
     Gain postFX;
 
-    PlinkyRev pRev;
-    pRev.mix(0.5);
+    PlinkyRev pRev[MAX_BUFFER];
+    for (int i; i < MAX_BUFFER; i++) {
+        pRev[i].mix(0.5);
+    }
 
 
     // This is a stack of buffers, whatever on the top get recorded or thrown
@@ -97,7 +99,7 @@ class PlayerState {
         // to the adc & dac channel
         postFX => lim;
         for (int i; i < MAX_BUFFER; i++) {
-            adc.chan(adc_channel) => bufs[i].lisa => preFX => pitchS[i] => pRev => postFX;
+            adc.chan(adc_channel) => bufs[i].lisa => preFX => pitchS[i] => pRev[i] => postFX;
             // delayL[i].gain(.99);
             // 4000::ms => delayL[i].max => delayL[i].delay;
             // .5 => pitchS[i].mix => echoA[i].mix => echoB[i].mix => echoC[i].mix;
@@ -227,9 +229,9 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
                 ps[i].pitchS[j].mix(fx_mix);
                 ps[i].pitchS[j].shift(shift_amt);
 
-                ps[i].pRev.mix(fx_mix);
-                ps[i].pRev.shim(plinky_amt);
-                ps[i].pRev.wobble(plinky_amt);
+                ps[i].pRev[j].mix(fx_mix);
+                ps[i].pRev[j].shim(plinky_amt);
+                ps[i].pRev[j].wobble(plinky_amt);
 
                 // delay_ms::ms => ps[i].echoA[j].delay => ps[i].echoB[j].delay =>
                 // ps[i].echoC[j].delay;
