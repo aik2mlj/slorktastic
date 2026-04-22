@@ -4,7 +4,7 @@ public class QuantizeStatus {
 
     dur loopDur;
     0 => int on;
-    float allowedMeters[] = [1 / 4];
+    [0.25] @=> float allowedMeters[];
 
     SndBuf kick;
     me.dir() + "audio/kick.wav" => kick.read;
