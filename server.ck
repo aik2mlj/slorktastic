@@ -12,6 +12,7 @@ if (me.args()) {
 
 PlayerState ps[N];
 QuantizeStatus qtStatus;
+spork ~ qtStatus.playKickLoop();
 
 class LiSaBuf {
     LiSa lisa;
@@ -34,6 +35,7 @@ class LiSaBuf {
         while (true) {
             // determine using quantized or original recorded duration
             // WARNING: we are using the global qtStatus, might not be the best
+            <<< "quantize:", qtStatus.on >>>;
             dur d;
             if (qtStatus.on)
                 qtDuration => d;
@@ -267,6 +269,7 @@ fun void handlePop(int ID) {
 fun void handleQuantize() {
     if (!qtStatus.on) {
         // quantize turn on
+        <<< "QUANTIZE ON" >>>;
         qtStatus.setOn();
         // set the quantize duration for each buffer
         for (int i; i < N; i++) {
@@ -276,6 +279,7 @@ fun void handleQuantize() {
         }
     } else if (qtStatus.on) {
         // quantize turn off
+        <<< "QUANTIZE OFF" >>>;
         qtStatus.setOff();
     }
 }
