@@ -14,6 +14,7 @@ class LiSaBuf {
     LiSa lisa;
     time recStart;
     dur recDuration;
+    float durationScalingFactor;
 
     10::second => dur MAX_BUFFER_DURATION;
     1 => int NUM_VOICES;
@@ -42,7 +43,7 @@ class LiSaBuf {
                 RAMP_TIME => now;
 
                 // <<< "SUSTAIN" >>>;
-                recDuration - 2 * RAMP_TIME => now;
+                (recDuration - 2 * RAMP_TIME) * durationScalingFactor => now;
 
                 lisa.rampDown(v, RAMP_TIME);
                 // <<< "RELEASE" >>>;
@@ -91,9 +92,9 @@ class PlayerState {
         // to the adc & dac channel
         postFX => lim;
         for (int i; i < MAX_BUFFER; i++) {
-            adc.chan(adc_channel) => bufs[i].lisa => preFX => pitchS[i] => postFX => delayL[i] => postFX;
-            delayL[i].gain(.99);
-            4000::ms => delayL[i].max => delayL[i].delay;
+            adc.chan(adc_channel) => bufs[i].lisa => preFX => pitchS[i] => postFX;
+            // delayL[i].gain(.99);
+            // 4000::ms => delayL[i].max => delayL[i].delay;
             // .5 => pitchS[i].mix => echoA[i].mix => echoB[i].mix => echoC[i].mix;
             // 4000::ms => echoA[i].max => echoB[i].max => echoC[i].max;
             <<< "Player", id, "buffer", bufs[i] >>>;
@@ -210,8 +211,11 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
             Math.clampf(Math.map2(z_pos, 0, .4, 0, 1.0), 0, 1.0) => float fx_mix;
             chout <= "current shift: " <= shift_amt <= IO.newline();
 
-            Math.map2(y_pos, -1, 1, 3000, 800) => float delay_ms;
-            chout <= "current delay: " <= delay_ms <= IO.newline();
+            // Math.map2(y_pos, -1, 1, 3000, 800) => float delay_ms;
+            // chout <= "current delay: " <= delay_ms <= IO.newline();
+
+            Math.map2(y_pos, -1, 1, 1, .25) => float intervalScaling;
+            chout <= "current interval scaling: " <= intervalScaling <= IO.newline();
 
             for (int j; j < MAX_BUFFER; j++) {
                 ps[i].pitchS[j].mix(fx_mix);
@@ -219,9 +223,10 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
 
                 // delay_ms::ms => ps[i].echoA[j].delay => ps[i].echoB[j].delay =>
                 // ps[i].echoC[j].delay;
-                delay_ms::ms => ps[i].delayL[j].max => ps[i].delayL[j].delay;
+                // delay_ms::ms => ps[i].delayL[j].max => ps[i].delayL[j].delay;
                 // delay_ms::ms => ps[i].echoA[j].delay => ps[i].echoB[j].delay =>
-                // ps[i].echoC[j].delay;
+
+                intervalScaling => ps[i].bufs[j].durationScalingFactor;
             }
         }
     }
