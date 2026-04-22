@@ -215,12 +215,12 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
             // Math.map2(y_pos, -1, 1, 3000, 800) => float delay_ms;
             // chout <= "current delay: " <= delay_ms <= IO.newline();
 
-            Math.map2(y_pos, -1, 1, .25, 2.0) => float rateScaling;
+            Math.map2(x_pos, -1, 1, .5, 2.0) => float rateScaling;
             // chout <= "current interval scaling: " <= intervalScaling <= IO.newline();
 
             for (int j; j < MAX_BUFFER; j++) {
-                ps[i].pitchS[j].mix(fx_mix);
-                ps[i].pitchS[j].shift(shift_amt);
+                ps[i].pitchS[j].mix(0);
+                // ps[i].pitchS[j].shift(shift_amt);
 
                 // delay_ms::ms => ps[i].echoA[j].delay => ps[i].echoB[j].delay =>
                 // ps[i].echoC[j].delay;
