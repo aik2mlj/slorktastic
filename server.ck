@@ -92,8 +92,8 @@ class PlayerState {
         postFX => lim;
         for (int i; i < MAX_BUFFER; i++) {
             adc.chan(adc_channel) => bufs[i].lisa => preFX => pitchS[i] => postFX => delayL[i] => postFX;
-            delayL[i].gain(.95);
-            1000::ms => delayL[i].max => delayL[i].delay;
+            delayL[i].gain(.99);
+            4000::ms => delayL[i].max => delayL[i].delay;
             // .5 => pitchS[i].mix => echoA[i].mix => echoB[i].mix => echoC[i].mix;
             // 4000::ms => echoA[i].max => echoB[i].max => echoC[i].max;
             <<< "Player", id, "buffer", bufs[i] >>>;
