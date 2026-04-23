@@ -42,6 +42,8 @@ public class GameTrak {
     // if (me.args())
     //     me.arg(0) => Std.atoi => device;
 
+    false => int RECORDING;
+
     Hid trak;
     if (trak.openJoystick(gt_device)) {
         <<< "GameTrak / joystick:", trak.name(), "on" >>>;
@@ -101,6 +103,22 @@ public class GameTrak {
                             if (axis[msg.which] < 0)
                                 0 => axis[msg.which];
                         }
+                    }
+                }
+                else if (msg.isButtonDown()){
+                    <<< "button", msg.which, "down" >>>;
+                    if(!RECORDING)
+                    {
+                        true => RECORDING;
+                        sendRecord(true);
+                    }
+                }
+                else if (msg.isButtonUp()){
+                    <<< "button", msg.which, "up" >>>;
+                    if(RECORDING)
+                    {
+                        false => RECORDING;
+                        sendRecord(false);
                     }
                 }
             }
@@ -175,7 +193,7 @@ public class GameTrak {
         }
     }
 
-    false => int RECORDING;
+    
 
     fun void kbListener() {
         // infinite event loop
@@ -189,11 +207,11 @@ public class GameTrak {
                 if (msg.isButtonDown()) {
                     <<< "down:", msg.which, "(code)", msg.key, "(usb key)", msg.ascii, "(ascii)" >>>;
                     if (msg.key == 44 && !RECORDING) {
-                        true => RECORDING;
+                        // true => RECORDING;
                         // now => recordingStart;
                         // <<< "RECORDING ON" >>>;
                         // buf.record(true);
-                        sendRecord(true);
+                        // sendRecord(true);
                     } else if (msg.key == 14) {
                         // k: pop the topBuf
                         sendPop();
