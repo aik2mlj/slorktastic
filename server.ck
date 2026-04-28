@@ -287,6 +287,7 @@ fun void handleRecord(int ID, int toggle) {
 
             if (toggle) {
                 now => buf.recStart;
+                0 => buf.recDuration;
                 buf.clear();
                 chout <= "recording started for player " <= ID <= IO.newline();
                 buf.lisa.record(true);
