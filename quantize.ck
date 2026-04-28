@@ -11,7 +11,7 @@ public class QuantizeStatus {
     0 => kick.gain;
 
     // connect to every channel
-    for (int i; i < dac.channels(); i++) {
+    for (8 => int i; i < dac.channels(); i++) {
         kick => dac.chan(i);
     }
 
@@ -20,7 +20,7 @@ public class QuantizeStatus {
     fun void setOn(dur d) {
         1 => on;
         d => loopDur;
-        0.1 => kick.gain;
+        0.2 => kick.gain;
     }
     fun void setOff() {
         0 => on;
