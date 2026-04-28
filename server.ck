@@ -23,6 +23,8 @@ class LiSaBuf {
     1.0 => float playbackRate;
     dur qtDuration;
 
+    .25 => float MAX_GAIN;
+
     10::second => dur MAX_BUFFER_DURATION;
     1 => int NUM_VOICES;
     200::ms => dur RAMP_TIME;
@@ -50,7 +52,7 @@ class LiSaBuf {
                 if (v < 0)
                     return;
 
-                lisa.voiceGain(v, .25);
+                lisa.voiceGain(v, MAX_GAIN);
                 lisa.rate(v, playbackRate);
                 // lisa.loop(v, 1);
 
@@ -69,6 +71,22 @@ class LiSaBuf {
             } else {
                 100::ms => now;
             }
+        }
+    }
+
+    fun void fadeOut()
+    {
+        for(int i; i < 50; i++) {
+            lisa.voiceGain(0, MAX_GAIN * (1 - i / 100.0));
+            1::ms => now;
+        }
+    }
+
+    fun void fadeIn()
+    {
+        for(int i; i < 50; i++) {
+            lisa.voiceGain(0, MAX_GAIN * i / 100.0);
+            1::ms => now;
         }
     }
 
@@ -286,6 +304,7 @@ fun void handleRecord(int ID, int toggle) {
             ps[i].topBuf() @=> LiSaBuf @buf;
 
             if (toggle) {
+                buf.fadeOut();
                 now => buf.recStart;
                 0::ms => buf.recDuration;
                 0::ms => buf.qtDuration;
@@ -298,6 +317,7 @@ fun void handleRecord(int ID, int toggle) {
                 // also calculate the quantization
                 buf.setQuantize();
                 buf.lisa.record(false);
+                buf.fadeIn();
             }
         }
     }
