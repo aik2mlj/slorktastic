@@ -228,7 +228,7 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
 
             Math.map2(x_pos, -1, 1, 0.0001, 2) => float shift_amt;
             Math.clampf(Math.map2(z_pos, 0, .4, 0, 1.0), 0, 1.0) => float fx_mix;
-            chout <= "current shift: " <= shift_amt <= IO.newline();
+            // chout <= "current shift: " <= shift_amt <= IO.newline();
 
             // Math.map2(y_pos, -1, 1, 3000, 800) => float delay_ms;
             // chout <= "current delay: " <= delay_ms <= IO.newline();

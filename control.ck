@@ -258,8 +258,8 @@ public class GameTrak {
     }
 
     fun void sendContinuous() {
-        chout <= "sending xyz from ID: " <= ID <= "x: " <= x_pos <= "y: " <= y_pos <= "z: " <=
-            z_pos <= " to server: " <= IO.newline();
+        // chout <= "sending xyz from ID: " <= ID <= "x: " <= x_pos <= "y: " <= y_pos <= "z: " <=
+        //     z_pos <= " to server: " <= IO.newline();
         xmit.start("/player/xyz_pos");
         ID => xmit.add;
         x_pos => xmit.add;
