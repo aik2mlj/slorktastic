@@ -1,7 +1,7 @@
 @import "control.ck"
 
 for (int i; i < 6; i++) {
-    adc.chan(0) => dac.chan(i);
+    adc.chan(0) => dac.chan(i + 16);
 }
 
 // better localization: only the top speaker
