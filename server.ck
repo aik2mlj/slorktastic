@@ -67,6 +67,8 @@ class PlayerState {
 
     Dyno lim;
     lim.limit();
+    lim.slopeAbove(.01);
+    lim.thresh(.2);
     Gain preFX;
 
     // effects for continuous control
@@ -93,11 +95,11 @@ class PlayerState {
         id => ID;
         id => adc_channel;
         id + 8 => dac_channel;
-        // lim => dac.chan(dac_channel);
+        lim => dac.chan(dac_channel);
 
         // The adc & dac channel now won't change, only that some buffers may disconnect / reconnect
         // to the adc & dac channel
-        postFX => dac.chan(dac_channel);
+        postFX => lim;
         for (int i; i < MAX_BUFFER; i++) {
             adc.chan(adc_channel) => bufs[i].lisa => preFX => pitchS[i] => pRev[i] => postFX;
             // delayL[i].gain(.99);
