@@ -93,11 +93,11 @@ class PlayerState {
         id => ID;
         id => adc_channel;
         id + 8 => dac_channel;
-        lim => dac.chan(dac_channel);
+        // lim => dac.chan(dac_channel);
 
         // The adc & dac channel now won't change, only that some buffers may disconnect / reconnect
         // to the adc & dac channel
-        postFX => lim;
+        postFX => dac.chan(dac_channel);
         for (int i; i < MAX_BUFFER; i++) {
             adc.chan(adc_channel) => bufs[i].lisa => preFX => pitchS[i] => pRev[i] => postFX;
             // delayL[i].gain(.99);
