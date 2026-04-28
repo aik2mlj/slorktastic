@@ -35,7 +35,7 @@ class LiSaBuf {
         while (true) {
             // determine using quantized or original recorded duration
             // WARNING: we are using the global qtStatus, might not be the best
-            <<< "quantize:", qtStatus.on >>>;
+            // <<< "quantize:", qtStatus.on >>>;
             dur d;
             if (qtStatus.on)
                 qtDuration => d;
@@ -289,7 +289,7 @@ fun void playerListener() {
         oin => now;
 
         while (oin.recv(msg)) {
-            chout <= "received message: " <= msg.address <= IO.newline();
+            // chout <= "received message: " <= msg.address <= IO.newline();
             if (msg.address == "/player/throw") {
                 if (msg.typetag == "if") {
                     msg.getInt(0) => int ID;
@@ -337,7 +337,7 @@ fun void playerListener() {
                     msg.getFloat(2) => float y_pos;
                     msg.getFloat(3) => float z_pos;
                     continuousControlListener(ID, x_pos, y_pos, z_pos);
-                    chout <= "popping buf from: " <= ID <= IO.newline();
+                    // chout <= "popping buf from: " <= ID <= IO.newline();
                 }
             }
 
