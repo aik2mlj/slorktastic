@@ -1,11 +1,11 @@
 @import "control.ck"
 
-// for (int i; i < 6; i++) {
-//     adc.chan(0) => dac.chan(i);
-// }
+for (int i; i < 6; i++) {
+    adc.chan(0) => dac.chan(i);
+}
 
 // better localization: only the top speaker
-adc.chan(0) => dac.chan(5);
+// adc.chan(0) => dac.chan(5);
 
 GG.camera().orthographic();
 
