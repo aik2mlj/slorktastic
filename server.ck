@@ -75,7 +75,7 @@ class LiSaBuf {
     fun void clear() {
         lisa.clear();
         lisa.recPos(0::samp);
-        0::samp => recDuration;
+        100::second => recDuration;
     }
 }
 
