@@ -68,13 +68,13 @@ class PlayerState {
     Dyno lim_postFX;
     lim_postFX.slopeBelow(1.0);
     lim_postFX.slopeAbove(.01);
-    lim_postFX.thresh(.2);
+    lim_postFX.thresh(.4);
     lim_postFX.attackTime(10::ms);
     lim_postFX.releaseTime(200::ms);
     Dyno lim_preFx;
     lim_preFx.slopeBelow(1.0);
     lim_preFx.slopeAbove(.01);
-    lim_preFx.thresh(.3);
+    lim_preFx.thresh(.5);
     lim_preFx.attackTime(10::ms);
     lim_preFx.releaseTime(200::ms);
     Gain preFX;
@@ -86,7 +86,7 @@ class PlayerState {
     PitShift pitchS[MAX_BUFFER];
     DelayL delayL[MAX_BUFFER];
     Gain postFX;
-    postFX.gain(.4);
+    postFX.gain(1.0);
 
     PlinkyRev pRev[MAX_BUFFER];
     for (int i; i < MAX_BUFFER; i++) {
