@@ -34,7 +34,7 @@ class LiSaBuf {
                 if (v < 0)
                     return;
 
-                lisa.voiceGain(v, .5);
+                lisa.voiceGain(v, .25);
                 lisa.rate(v, playbackRate);
                 lisa.loop(v, 1);
 
@@ -65,10 +65,14 @@ class PlayerState {
     // Blackhole DAC channel
     int dac_channel;
 
-    Dyno lim;
-    lim.limit();
-    lim.slopeAbove(.01);
-    lim.thresh(.2);
+    Dyno lim_postFX;
+    lim_postFX.limit();
+    lim_postFX.slopeAbove(.01);
+    lim_postFX.thresh(.2);
+    Dyno lim_preFx;
+    lim_preFx.limit();
+    lim_preFx.slopeAbove(.01);
+    lim_preFx.thresh(.3);
     Gain preFX;
 
     // effects for continuous control
@@ -95,13 +99,13 @@ class PlayerState {
         id => ID;
         id => adc_channel;
         id + 8 => dac_channel;
-        lim => dac.chan(dac_channel);
+        lim_postFX => dac.chan(dac_channel);
 
         // The adc & dac channel now won't change, only that some buffers may disconnect / reconnect
         // to the adc & dac channel
-        postFX => lim;
+        postFX => lim_postFX;
         for (int i; i < MAX_BUFFER; i++) {
-            adc.chan(adc_channel) => bufs[i].lisa => preFX => pitchS[i] => pRev[i] => postFX;
+            adc.chan(adc_channel) => bufs[i].lisa => preFX => lim_preFx => pitchS[i] => pRev[i] => postFX;
             // delayL[i].gain(.99);
             // 4000::ms => delayL[i].max => delayL[i].delay;
             // .5 => pitchS[i].mix => echoA[i].mix => echoB[i].mix => echoC[i].mix;
