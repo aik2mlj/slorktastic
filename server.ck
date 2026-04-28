@@ -52,7 +52,7 @@ class LiSaBuf {
 
                 lisa.voiceGain(v, .25);
                 lisa.rate(v, playbackRate);
-                lisa.loop(v, 1);
+                // lisa.loop(v, 1);
 
                 // <<< "ATTACK" >>>;
                 lisa.playPos(v, 0::samp);
