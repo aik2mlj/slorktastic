@@ -86,6 +86,7 @@ class PlayerState {
     PitShift pitchS[MAX_BUFFER];
     DelayL delayL[MAX_BUFFER];
     Gain postFX;
+    postFX.gain(.05);
 
     PlinkyRev pRev[MAX_BUFFER];
     for (int i; i < MAX_BUFFER; i++) {
