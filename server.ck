@@ -293,6 +293,8 @@ fun void handleRecord(int ID, int toggle) {
             } else {
                 chout <= "recording stopped for player " <= ID <= IO.newline();
                 now - buf.recStart => buf.recDuration;
+                // also calculate the quantization
+                buf.setQuantize();
                 buf.lisa.record(false);
             }
         }
