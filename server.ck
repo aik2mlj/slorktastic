@@ -66,13 +66,17 @@ class PlayerState {
     int dac_channel;
 
     Dyno lim_postFX;
-    lim_postFX.limit();
+    lim_postFX.slopeBelow(1.0);
     lim_postFX.slopeAbove(.01);
     lim_postFX.thresh(.2);
+    lim_postFX.attackTime(10::ms);
+    lim_postFX.releaseTime(200::ms);
     Dyno lim_preFx;
-    lim_preFx.limit();
+    lim_preFx.slopeBelow(1.0);
     lim_preFx.slopeAbove(.01);
     lim_preFx.thresh(.3);
+    lim_preFx.attackTime(10::ms);
+    lim_preFx.releaseTime(200::ms);
     Gain preFX;
 
     // effects for continuous control
