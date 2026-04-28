@@ -1,6 +1,6 @@
 public class QuantizeStatus {
     // default value of loopDur
-    2::second => dur DEFAULT_LOOPDUR;
+    1::second => dur DEFAULT_LOOPDUR;
 
     dur loopDur;
     0 => int on;
@@ -20,7 +20,7 @@ public class QuantizeStatus {
     fun void setOn(dur d) {
         1 => on;
         d => loopDur;
-        0.5 => kick.gain;
+        0.1 => kick.gain;
     }
     fun void setOff() {
         0 => on;
