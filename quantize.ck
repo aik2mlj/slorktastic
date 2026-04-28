@@ -1,10 +1,10 @@
 public class QuantizeStatus {
     // default value of loopDur
-    1::second => dur DEFAULT_LOOPDUR;
+    0.5::second => dur DEFAULT_LOOPDUR;
 
     dur loopDur;
     0 => int on;
-    [0.25] @=> float allowedMeters[];
+    [0.5] @=> float allowedMeters[];
 
     SndBuf kick;
     me.dir() + "audio/kick.wav" => kick.read;
