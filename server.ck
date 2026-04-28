@@ -132,9 +132,8 @@ class PlayerState {
         // to the adc & dac channel
         postFX => lim_postFX;
         for (int i; i < MAX_BUFFER; i++) {
-            // adc.chan(adc_channel) => bufs[i].lisa => preFX => lim_preFx => pitchS[i] => pRev[i]
-            // => postFX;
-            adc.chan(adc_channel) => bufs[i].lisa => postFX;
+            adc.chan(adc_channel) => bufs[i].lisa => preFX => lim_preFx => pitchS[i] => pRev[i] => postFX;
+            // adc.chan(adc_channel) => bufs[i].lisa => postFX;
             // delayL[i].gain(.99);
             // 4000::ms => delayL[i].max => delayL[i].delay;
             // .5 => pitchS[i].mix => echoA[i].mix => echoB[i].mix => echoC[i].mix;
