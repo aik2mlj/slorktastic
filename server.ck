@@ -11,11 +11,11 @@ if (me.args()) {
     me.arg(0) => Std.atoi => N;
 }
 
+["audio/monologue1.wav", "audio/monologue2.wav", "audio/monologue3.wav"] @=> string monologuePath[];
+
 PlayerState ps[N];
 QuantizeStatus qtStatus;
 spork ~ qtStatus.playKickLoop();
-
-["audio/monologue1.wav", "audio/monologue2.wav", "audio/monologue3.wav"] @=> string monologuePath[N];
 
 class LiSaBuf {
     LiSa lisa;
@@ -443,7 +443,7 @@ fun void playerListener() {
             }
             if(msg.address == "/player/monologue") {
                 if (msg.typetag == "i") {
-                    handleMonologue();
+                    startMonologue();
                 }
             }
         }
