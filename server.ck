@@ -135,10 +135,7 @@ class PlayerState {
     }
 
     SndBuf monologueBuf => dac.chan(dac_channel);
-    monologuePath[ID] => monologueBuf.read;
-    if( !monologueBuf.ready() ) <<<"failed to load monologue file", monologuePath[ID] >>>;
-    else <<<"monologue file loaded", monologuePath[ID] >>>;
-    monologueBuf.gain(0);
+    
 
     // This is a stack of buffers, whatever on the top get recorded or thrown
     LiSaBuf bufs[MAX_BUFFER];
@@ -164,6 +161,11 @@ class PlayerState {
             // 4000::ms => echoA[i].max => echoB[i].max => echoC[i].max;
             <<< "Player", id, "buffer", bufs[i] >>>;
         }
+
+        monologuePath[ID] => monologueBuf.read;
+        if( !monologueBuf.ready() ) <<<"failed to load monologue file", monologuePath[ID] >>>;
+        else <<<"monologue file loaded", monologuePath[ID] >>>;
+        monologueBuf.gain(0);
     }
 
     fun LiSaBuf @topBuf() { return bufs[p]; }
