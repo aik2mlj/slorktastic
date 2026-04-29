@@ -136,6 +136,8 @@ class PlayerState {
 
     SndBuf monologueBuf => dac.chan(dac_channel);
     monologuePath[ID] => monologueBuf.read;
+    if( !monologueBuf.ready() ) <<<"failed to load monologue file", monologuePath[ID] >>>;
+    else <<<"monologue file loaded", monologuePath[ID] >>>;
     monologueBuf.gain(0);
 
     // This is a stack of buffers, whatever on the top get recorded or thrown
@@ -366,6 +368,7 @@ fun void handleQuantize() {
 }
 
 fun void startMonologue() {
+    <<< "Starting Monologue" >>>;
     for (int i; i < N; i++) {
         // start monologue for each player
         ps[i].monologueBuf.gain(1.0);
