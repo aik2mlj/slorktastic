@@ -41,11 +41,12 @@ class LiSaBuf {
             // determine using quantized or original recorded duration
             // WARNING: we are using the global qtStatus, might not be the best
             // <<< "quantize:", qtStatus.on >>>;
-            dur d;
-            if (qtStatus.on)
-                qtDuration => d;
-            else
-                recDuration => d;
+            // now quantization always on, pressing q just enable the kick
+            qtDuration => dur d;
+            // if (qtStatus.on)
+            //     qtDuration => d;
+            // else
+            //     recDuration => d;
 
             if (d >= 2 * RAMP_TIME) {
                 lisa.getVoice() => int v;

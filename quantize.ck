@@ -3,7 +3,7 @@ public class QuantizeStatus {
     0.5::second => dur DEFAULT_LOOPDUR;
 
     DEFAULT_LOOPDUR => dur loopDur;
-    1 => int on;
+    0 => int on;
     [0.5] @=> float allowedMeters[];
 
     SndBuf kick;
@@ -23,7 +23,7 @@ public class QuantizeStatus {
         0.2 => kick.gain;
     }
     fun void setOff() {
-        1 => on;
+        0 => on;
         0 => kick.gain;
     }
 
