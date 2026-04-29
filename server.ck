@@ -231,7 +231,7 @@ class PlayerState {
 
     fun void playMonologue()
     {
-        monologueBuf.gain(1.0);
+        monologueBuf.gain(1.8);
         monologueBuf.pos(0);
         monologueBuf.play();
         while(true)
@@ -387,12 +387,13 @@ fun void handleQuantize() {
 fun void startMonologue() {
     <<< "Starting Monologue" >>>;
     for (int i; i < N; i++) {
+        ps[i].fadeBufsOut();
         // start monologue for each player
         spork ~ ps[i].playMonologue();
 
         // lower gain of LiSa bufs 
         for(int j; j < ps[i].bufs.size(); j++) {
-            .1 => ps[i].bufs[j].MAX_GAIN_BASE;
+            .15 => ps[i].bufs[j].MAX_GAIN_BASE;
         }
     }
 }
