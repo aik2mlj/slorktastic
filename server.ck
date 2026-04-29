@@ -75,17 +75,15 @@ class LiSaBuf {
         }
     }
 
-    fun void fadeOut()
-    {
-        for(int i; i < 50; i++) {
+    fun void fadeOut() {
+        for (int i; i < 50; i++) {
             lisa.voiceGain(0, MAX_GAIN * (1 - i / 100.0));
             1::ms => now;
         }
     }
 
-    fun void fadeIn()
-    {
-        for(int i; i < 50; i++) {
+    fun void fadeIn() {
+        for (int i; i < 50; i++) {
             lisa.voiceGain(0, MAX_GAIN * i / 100.0);
             1::ms => now;
         }
@@ -209,17 +207,13 @@ class PlayerState {
         buf.playLoop();
     }
 
-    fun void fadeBufsOut()
-    {
-        for(int i; i < bufs.size(); i++)
-        {
+    fun void fadeBufsOut() {
+        for (int i; i < bufs.size(); i++) {
             spork ~ bufs[i].fadeOut();
         }
     }
-    fun void fadeBufsIn()
-    {
-        for(int i; i < bufs.size(); i++)
-        {
+    fun void fadeBufsIn() {
+        for (int i; i < bufs.size(); i++) {
             spork ~ bufs[i].fadeIn();
         }
     }
