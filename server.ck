@@ -226,6 +226,17 @@ class PlayerState {
             spork ~ bufs[i].fadeIn();
         }
     }
+
+    fun void playMonologue()
+    {
+        monologueBuf.gain(1.0);
+        monologueBuf.pos(0);
+        monologueBuf.play();
+        while(true)
+        {
+            samp => now;
+        }
+    }
 }
 
 // Initialize N players, ID = i, ADC = i, DAC = i + 8
@@ -373,9 +384,7 @@ fun void startMonologue() {
     <<< "Starting Monologue" >>>;
     for (int i; i < N; i++) {
         // start monologue for each player
-        ps[i].monologueBuf.gain(1.0);
-        ps[i].monologueBuf.pos(0);
-
+        spork ~ ps[i].playMonologue();
         // lower gain of LiSa bufs 
         for(int j; j < ps[i].bufs.size(); j++) {
             .1 => ps[i].bufs[j].MAX_GAIN;
