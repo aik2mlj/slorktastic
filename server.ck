@@ -231,7 +231,7 @@ class PlayerState {
 
     fun void playMonologue()
     {
-        monologueBuf.gain(1.8);
+        monologueBuf.gain(2.5);
         monologueBuf.pos(0);
         monologueBuf.play();
         while(true)
