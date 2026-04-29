@@ -317,7 +317,7 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
                 ps[i].pRev[j].shim(plinky_amt);
                 ps[i].pRev[j].wobble(plinky_amt);
 
-                ps[i].bufs[j].MAX_GAIN_BASE + fx_mix * .4 => ps[i].bufs[j].MAX_GAIN;
+                ps[i].bufs[j].MAX_GAIN_BASE + fx_mix * .1 => ps[i].bufs[j].MAX_GAIN;
 
                 // delay_ms::ms => ps[i].echoA[j].delay => ps[i].echoB[j].delay =>
                 // ps[i].echoC[j].delay;
