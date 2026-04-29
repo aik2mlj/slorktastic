@@ -15,6 +15,8 @@ PlayerState ps[N];
 QuantizeStatus qtStatus;
 spork ~ qtStatus.playKickLoop();
 
+["audio/monologue1.wav", "audio/monologue2.wav", "audio/monologue3.wav"] @=> string monologuePath[N];
+
 class LiSaBuf {
     LiSa lisa;
     time recStart;
@@ -132,6 +134,9 @@ class PlayerState {
         pRev[i].mix(0.5);
     }
 
+    SndBuf monologueBuf => dac.chan(dac_channel);
+    monologuePath[ID] => monologueBuf.read;
+    monologueBuf.gain(0);
 
     // This is a stack of buffers, whatever on the top get recorded or thrown
     LiSaBuf bufs[MAX_BUFFER];
@@ -242,6 +247,7 @@ oin.addAddress("/player/record");
 oin.addAddress("/player/xyz_pos");
 oin.addAddress("/player/pop");
 oin.addAddress("/player/quantize");
+oin.addAddress("/player/monologue");
 
 fun void doThrow(int sourceID, float angle) {
     int targetID;
@@ -359,6 +365,19 @@ fun void handleQuantize() {
     }
 }
 
+fun void startMonologue() {
+    for (int i; i < N; i++) {
+        // start monologue for each player
+        ps[i].monologueBuf.gain(1.0);
+        ps[i].monologueBuf.pos(0);
+
+        // lower gain of LiSa bufs 
+        for(int j; j < ps[i].bufs.size(); j++) {
+            .1 => ps[i].bufs[j].MAX_GAIN;
+        }
+    }
+}
+
 fun void playerListener() {
     while (true) {
         oin => now;
@@ -420,6 +439,11 @@ fun void playerListener() {
                 if (msg.typetag == "i") {
                     // msg.getInt(0) => int quantize;
                     handleQuantize();
+                }
+            }
+            if(msg.address == "/player/monologue") {
+                if (msg.typetag == "i") {
+                    handleMonologue();
                 }
             }
         }

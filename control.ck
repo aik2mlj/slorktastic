@@ -218,7 +218,11 @@ public class GameTrak {
                     } else if (msg.key == 20) {
                         // q: quantize
                         sendQuantize();
+                    } else if (msg.key == 16) {
+                        // m: start monologue
+                        sendMonologue();
                     }
+                    
                 } else {
                     if (msg.key == 44 && RECORDING) {
                         false => RECORDING;
@@ -283,6 +287,13 @@ public class GameTrak {
     fun void sendQuantize() {
         chout <= "sending QUANTIZE to server: " <= SERVER_IP <= IO.newline();
         xmit.start("/player/quantize");
+        1 => xmit.add;
+        xmit.send();
+    }
+
+    fun void sendMonologue(){
+        chout <= "sending MONOLOGUE to server: " <= SERVER_IP <= IO.newline();
+        xmit.start("/player/monologue");
         1 => xmit.add;
         xmit.send();
     }
