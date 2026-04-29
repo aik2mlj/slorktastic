@@ -387,7 +387,9 @@ fun void handleQuantize() {
 fun void startMonologue() {
     <<< "Starting Monologue" >>>;
     for (int i; i < N; i++) {
-        ps[i].fadeBufsOut();
+        for(int j; j < ps[i].bufs.size(); j++) {
+            ps[i].bufs[j].clear();
+        }
         // start monologue for each player
         spork ~ ps[i].playMonologue();
 
