@@ -134,7 +134,7 @@ class PlayerState {
         pRev[i].mix(0.5);
     }
 
-    SndBuf monologueBuf => dac.chan(dac_channel);
+    SndBuf monologueBuf;
     
 
     // This is a stack of buffers, whatever on the top get recorded or thrown
@@ -162,6 +162,7 @@ class PlayerState {
             <<< "Player", id, "buffer", bufs[i] >>>;
         }
 
+        monologueBuf => dac.chan(dac_channel);
         monologuePath[ID] => monologueBuf.read;
         if( !monologueBuf.ready() ) <<<"failed to load monologue file", monologuePath[ID] >>>;
         else <<<"monologue file loaded", monologuePath[ID] >>>;
@@ -385,6 +386,7 @@ fun void startMonologue() {
     for (int i; i < N; i++) {
         // start monologue for each player
         spork ~ ps[i].playMonologue();
+
         // lower gain of LiSa bufs 
         for(int j; j < ps[i].bufs.size(); j++) {
             .1 => ps[i].bufs[j].MAX_GAIN;
