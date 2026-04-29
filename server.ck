@@ -207,6 +207,21 @@ class PlayerState {
         bufs[id] @=> LiSaBuf buf;
         buf.playLoop();
     }
+
+    fun void fadeBufsOut()
+    {
+        for(int i; i < bufs.size(); i++)
+        {
+            spork ~ bufs[i].fadeOut();
+        }
+    }
+    fun void fadeBufsIn()
+    {
+        for(int i; i < bufs.size(); i++)
+        {
+            spork ~ bufs[i].fadeIn();
+        }
+    }
 }
 
 // Initialize N players, ID = i, ADC = i, DAC = i + 8
@@ -304,7 +319,7 @@ fun void handleRecord(int ID, int toggle) {
             ps[i].topBuf() @=> LiSaBuf @buf;
 
             if (toggle) {
-                buf.fadeOut();
+                ps[i].fadeBufsOut();
                 now => buf.recStart;
                 0::ms => buf.recDuration;
                 0::ms => buf.qtDuration;
@@ -317,7 +332,7 @@ fun void handleRecord(int ID, int toggle) {
                 // also calculate the quantization
                 buf.setQuantize();
                 buf.lisa.record(false);
-                buf.fadeIn();
+                ps[i].fadeBufsIn();
             }
         }
     }
