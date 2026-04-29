@@ -25,6 +25,7 @@ class LiSaBuf {
     1.0 => float playbackRate;
     dur qtDuration;
 
+    .25 => float MAX_GAIN_BASE;
     .25 => float MAX_GAIN;
 
     10::second => dur MAX_BUFFER_DURATION;
@@ -316,6 +317,8 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
                 ps[i].pRev[j].shim(plinky_amt);
                 ps[i].pRev[j].wobble(plinky_amt);
 
+                ps[i].bufs[j].MAX_GAIN_BASE + fx_mix * .4 => ps[i].bufs[j].MAX_GAIN;
+
                 // delay_ms::ms => ps[i].echoA[j].delay => ps[i].echoB[j].delay =>
                 // ps[i].echoC[j].delay;
                 // delay_ms::ms => ps[i].delayL[j].max => ps[i].delayL[j].delay;
@@ -389,7 +392,7 @@ fun void startMonologue() {
 
         // lower gain of LiSa bufs 
         for(int j; j < ps[i].bufs.size(); j++) {
-            .1 => ps[i].bufs[j].MAX_GAIN;
+            .1 => ps[i].bufs[j].MAX_GAIN_BASE;
         }
     }
 }
