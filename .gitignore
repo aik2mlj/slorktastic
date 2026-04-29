@@ -10,3 +10,5 @@ imgui.ini
 *.zip
 *.tar.gz
 tmp/
+
+old/

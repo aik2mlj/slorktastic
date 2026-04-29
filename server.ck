@@ -11,7 +11,7 @@ if (me.args()) {
     me.arg(0) => Std.atoi => N;
 }
 
-["audio/monologue1.wav", "audio/monologue2.wav", "audio/monologue3.wav"] @=> string monologuePath[];
+["audio/monologue1_verb.wav", "audio/monologue2_verb.wav", "audio/monologue3_verb.wav"] @=> string monologuePath[];
 
 PlayerState ps[N];
 QuantizeStatus qtStatus;
@@ -397,9 +397,9 @@ fun void startMonologue() {
         spork ~ ps[i].playMonologue();
 
         // lower gain of LiSa bufs
-        for (int j; j < ps[i].bufs.size(); j++) {
-            .15 => ps[i].bufs[j].MAX_GAIN_BASE;
-        }
+        // for (int j; j < ps[i].bufs.size(); j++) {
+        //     .25 => ps[i].bufs[j].MAX_GAIN_BASE;
+        // }
     }
 }
 
