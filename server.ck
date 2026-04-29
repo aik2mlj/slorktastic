@@ -136,7 +136,7 @@ class PlayerState {
     }
 
     SndBuf monologueBuf;
-    
+
 
     // This is a stack of buffers, whatever on the top get recorded or thrown
     LiSaBuf bufs[MAX_BUFFER];
@@ -165,8 +165,10 @@ class PlayerState {
 
         monologueBuf => dac.chan(dac_channel);
         monologuePath[ID] => monologueBuf.read;
-        if( !monologueBuf.ready() ) <<<"failed to load monologue file", monologuePath[ID] >>>;
-        else <<<"monologue file loaded", monologuePath[ID] >>>;
+        if (!monologueBuf.ready())
+            <<< "failed to load monologue file", monologuePath[ID] >>>;
+        else
+            <<< "monologue file loaded", monologuePath[ID] >>>;
         monologueBuf.gain(0);
     }
 
@@ -229,13 +231,11 @@ class PlayerState {
         }
     }
 
-    fun void playMonologue()
-    {
+    fun void playMonologue() {
         monologueBuf.gain(2.5);
         monologueBuf.pos(0);
         monologueBuf.play();
-        while(true)
-        {
+        while (true) {
             samp => now;
         }
     }
@@ -386,15 +386,18 @@ fun void handleQuantize() {
 
 fun void startMonologue() {
     <<< "Starting Monologue" >>>;
+    // also turn of quantize
+    qtStatus.setOff();
+
     for (int i; i < N; i++) {
-        for(int j; j < ps[i].bufs.size(); j++) {
+        for (int j; j < ps[i].bufs.size(); j++) {
             ps[i].bufs[j].clear();
         }
         // start monologue for each player
         spork ~ ps[i].playMonologue();
 
-        // lower gain of LiSa bufs 
-        for(int j; j < ps[i].bufs.size(); j++) {
+        // lower gain of LiSa bufs
+        for (int j; j < ps[i].bufs.size(); j++) {
             .15 => ps[i].bufs[j].MAX_GAIN_BASE;
         }
     }
@@ -463,7 +466,7 @@ fun void playerListener() {
                     handleQuantize();
                 }
             }
-            if(msg.address == "/player/monologue") {
+            if (msg.address == "/player/monologue") {
                 if (msg.typetag == "i") {
                     startMonologue();
                 }
