@@ -34,7 +34,7 @@ sleep 2
 
 trap 'kill $AUTOPATCH_PID $JACKTRIP_PID $JACKD_PID 2>/dev/null' EXIT
 
-chuck --adc:"Apple Inc.: Potato" --dac:"Apple Inc.: Potato" -c28 client.ck:${SLOT}:cheese.local:0
+chuck --adc:"Apple Inc.: Potato" --dac:"Apple Inc.: Potato" -c28 client.ck:${SLOT}:cheese.local:"Apple Internal Keyboard / Trackpad"
 
 # turn wifi back on
 networksetup -setairportpower en0 on
