@@ -27,7 +27,7 @@ JACKTRIP_PID=$!
 
 sleep 2
 
-./client-autopatch.py &
+./scripts/client-autopatch.py &
 AUTOPATCH_PID=$!
 
 sleep 2

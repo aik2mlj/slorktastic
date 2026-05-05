@@ -26,7 +26,7 @@ JACKTRIP_PID=$!
 sleep 1
 
 # 3. launch autopatcher in background
-./server-autopatch.py &
+./scripts/server-autopatch.py &
 AUTOPATCH_PID=$!
 
 sleep 2
