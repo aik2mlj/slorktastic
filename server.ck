@@ -364,8 +364,8 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
                         // ps[i].monologueBuf[j].gain((1.0 - y_norm) * 2.5);
                         for(int k; k < ps[i].monologueBuf[j].maxVoices(); k++)
                         {
-                            ps[i].monologueBuf[j].voiceGain(k, (y_norm * 2.5));
-                            ps[i].monologueBuf[j].rate(k, 1 + Math.random2f(-.5, .5) * y_norm);
+                            ps[i].monologueBuf[j].voiceGain(k, (y_norm * 2.5) / ps[i].monologueBuf[j].maxVoices());
+                            ps[i].monologueBuf[j].rate(k, 1 + Math.random2f(-.5, .5) * y_norm * z_norm);
                         }
                     }
                     else
@@ -373,8 +373,8 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
                         // ps[i].monologueBuf[j].gain(2.5);
                         for(int k; k < ps[i].monologueBuf[j].maxVoices(); k++)
                         {
-                            ps[i].monologueBuf[j].voiceGain(k, 2.5);
-                            ps[i].monologueBuf[j].rate(k, 1 + Math.random2f(-.5, .5) * y_norm);
+                            ps[i].monologueBuf[j].voiceGain(k, 2.5 / ps[i].monologueBuf[j].maxVoices());
+                            ps[i].monologueBuf[j].rate(k, 1 + Math.random2f(-.5, .5) * y_norm * z_norm);
                         }
                     }
 
