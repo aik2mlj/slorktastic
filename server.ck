@@ -144,6 +144,8 @@ class PlayerState {
     8 => int monologueMaxVoices;
     LiSa monologueBuf[N];
 
+    PlinkyRev monologuePRev;
+
     // This is a stack of buffers, whatever on the top get recorded or thrown
     LiSaBuf bufs[MAX_BUFFER];
     // pointer to the top buffer
@@ -172,7 +174,7 @@ class PlayerState {
         for(int i; i < N; i++) {
             monologueBuf[i].read(monologuePath[i]);
             monologueBuf[i].gain(0);
-            monologueBuf[i] => dac.chan(dac_channel);
+            monologueBuf[i] => monologuePRev;
             monologueBuf[i].maxVoices(8);
             // chorus[i] => dac.chan(dac_channel);
             // chorus[i].mix(0);
@@ -187,6 +189,7 @@ class PlayerState {
             //     <<< "monologue file loaded", monologuePath[i] >>>;
             // monologueBuf[i].gain(0);
         }
+        monologuePRev => dac.chan(dac_channel);
     }
 
     fun LiSaBuf @topBuf() { return bufs[p]; }
@@ -358,6 +361,7 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
                 Math.map2(y_pos, -1, 1, 1.0, 0.0) => float y_norm;
                 Math.map2(z_pos, 0, .8, 0.0, 1.0) => float z_norm;
 
+                ps[i].monologuePRev.mix((y_norm * z_norm) * .2);
                 for(int j; j < N; j++)
                 {
                     if(j != ID){
