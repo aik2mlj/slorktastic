@@ -54,6 +54,7 @@ public class GameTrak {
     Hid hi;
     HidMsg msg;
     int kb_device;
+    string kb_name;
 
     fun GameTrak(int id, string server_ip, int kb_device) {
         id => ID;
@@ -62,6 +63,19 @@ public class GameTrak {
         xmit.dest(SERVER_IP, 8000);
 
         if (!hi.openKeyboard(kb_device))
+            me.exit();
+        <<< "keyboard '" + hi.name() + "' ready", "" >>>;
+    }
+
+    fun GameTrak(int id, string server_ip, string kb_n) {
+        id => ID;
+        "Player " + Std.itoa(ID) => ID_text.text;
+        server_ip => SERVER_IP;
+        xmit.dest(SERVER_IP, 8000);
+
+        kb_n => kb_name;
+
+        if (!hi.open(kb_name))
             me.exit();
         <<< "keyboard '" + hi.name() + "' ready", "" >>>;
     }
