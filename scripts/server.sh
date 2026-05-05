@@ -29,12 +29,30 @@ sleep 1
 ./scripts/server-autopatch.py &
 AUTOPATCH_PID=$!
 
-sleep 2
+sleep 1
 
-trap 'kill $AUTOPATCH_PID $JACKTRIP_PID $JACKD_PID 2>/dev/null' EXIT
+CHUCK_PID=
+start_chuck() {
+    chuck --adc:"Existential Audio Inc.: BlackHole 16ch" --dac:"Existential Audio Inc.: BlackHole 16ch" -c16 server.ck &
+    CHUCK_PID=$!
+}
 
-# 4. run chuck in foreground so ctrl-c stops everything cleanly
-chuck --adc:"Existential Audio Inc.: BlackHole 16ch" --dac:"Existential Audio Inc.: BlackHole 16ch" -c16 server.ck
+trap 'kill ${CHUCK_PID:-} $AUTOPATCH_PID $JACKTRIP_PID $JACKD_PID 2>/dev/null; networksetup -setairportpower en0 on' EXIT
 
-# turn wifi back on
-networksetup -setairportpower en0 on
+# 4. run chuck in background; press 'r' to restart, 'q' to quit (jacktrip/jackd stay up)
+start_chuck
+echo "[server] press 'r' to restart chuck, 'q' to quit"
+while IFS= read -rsn1 key; do
+    case "$key" in
+        r)
+            echo "[server] restarting chuck..."
+            kill "$CHUCK_PID" 2>/dev/null || true
+            wait "$CHUCK_PID" 2>/dev/null || true
+            start_chuck
+            ;;
+        q)
+            echo "[server] quitting..."
+            break
+            ;;
+    esac
+done
