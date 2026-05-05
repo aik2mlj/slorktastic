@@ -250,7 +250,7 @@ class PlayerState {
 
     fun void startMonologue() {
         for(int i; i < N; i++) {
-            // monologueBuf[i].gain(2.5);
+            monologueBuf[i].gain(2.5);
             // monologueBuf[i].pos(0);
             // monologueBuf[i].play();
             monologueBuf[i].play(1);
