@@ -11,12 +11,15 @@ system:capture_27 -> <jacktrip>:send_1
 """
 
 import jack
+import queue
+import threading
 import time
 
 CAPTURE = "system:capture_27"
 PLAYBACK = "system:playback_1"
 
 client = jack.Client("client-autopatch", no_start_server=True)
+work = queue.Queue()
 
 
 def find_jacktrip_ports():
@@ -59,17 +62,25 @@ def patch():
     return True
 
 
-def on_port(port, register):
-    if register and (port.name.endswith(":send_1") or port.name.endswith(":receive_1")):
+def worker():
+    while True:
+        work.get()
         time.sleep(0.05)  # let the sibling port register too
         patch()
 
 
+def on_port(port, register):
+    if register and (port.name.endswith(":send_1") or port.name.endswith(":receive_1")):
+        # never call jack server functions from the notification thread
+        work.put(None)
+
+
+threading.Thread(target=worker, daemon=True).start()
 client.set_port_registration_callback(on_port)
 client.activate()
 
 # in case jacktrip's ports already exist when we start
-patch()
+work.put(None)
 
 print("client autopatcher running. ctrl-c to quit.", flush=True)
 try:
