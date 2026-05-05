@@ -581,7 +581,7 @@ fun void routeAudio(int sourceID, int targetID) {
 // is proportional to the recDuration of the buffer
 
 GG.camera().orthographic();
-GG.camera().viewSize(10);
+GG.camera().viewSize(20);
 
 0.35 => float BAR_HEIGHT;
 0.08 => float BAR_GAP;
