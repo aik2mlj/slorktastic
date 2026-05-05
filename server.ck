@@ -587,6 +587,7 @@ GG.camera().viewSize(20);
 0.08 => float BAR_GAP;
 0.6  => float PLAYER_GAP;
 1.0  => float SEC_TO_WORLD;        // 1 second of recording == 1 world unit wide
+10.0 => float MAX_BAR_WIDTH;       // matches MAX_BUFFER_DURATION (10s)
 -7.0 => float ORIGIN_X;            // left edge of all bars
 @(1.0, 0.55, 0.15) => vec3 TOP_COLOR;
 @(0.35, 0.45, 0.7) => vec3 BUF_COLOR;
@@ -613,13 +614,14 @@ for (int i; i < N; i++) {
 
         bgs[i][j] --> GG.scene();
         bgs[i][j].posY(barY);
-        bgs[i][j].posX(ORIGIN_X + 5.0);
+        bgs[i][j].posX(ORIGIN_X + MAX_BAR_WIDTH / 2);
         bgs[i][j].scaY(BAR_HEIGHT);
-        bgs[i][j].scaX(10.0);
+        bgs[i][j].scaX(MAX_BAR_WIDTH);
         bgs[i][j].color(BG_COLOR);
 
         bars[i][j] --> GG.scene();
         bars[i][j].posY(barY);
+        bars[i][j].posZ(0.1);          // sit on top of the gray bg
         bars[i][j].scaY(BAR_HEIGHT);
         bars[i][j].color(BUF_COLOR);
     }
@@ -629,9 +631,13 @@ while (true) {
     for (int i; i < N; i++) {
         for (int j; j < MAX_BUFFER; j++) {
             (ps[i].bufs[j].recDuration / second) $ float => float secs;
-            Math.max(0.01, secs * SEC_TO_WORLD) => float w;
+            // clear() parks recDuration at 100s to mark the buffer empty — treat as 0
+            if (secs > 11.0)
+                0.0 => secs;
+            Math.max(0.01, Math.min(MAX_BAR_WIDTH, secs * SEC_TO_WORLD)) => float w;
             bars[i][j].scaX(w);
             bars[i][j].posX(ORIGIN_X + w / 2);
+            bars[i][j].posZ(0.1);
             if (j == ps[i].p)
                 bars[i][j].color(TOP_COLOR);
             else
