@@ -62,22 +62,8 @@ public class GameTrak {
         server_ip => SERVER_IP;
         xmit.dest(SERVER_IP, 8000);
 
-        if (!hi.openKeyboard(kb_device))
-        {
-            if(!hi.openKeyboard(kb_device + 1))
-            {
-                me.exit();
-            }
-            else
-            {
-                kb_device + 1 => kb_device;
-                <<< "keyboard '" + hi.name() + "' ready", "" >>>;
-            }
-        }
-        else
-        {
-            <<< "keyboard '" + hi.name() + "' ready", "" >>>;
-        }
+        if (!hi.openKeyboard(kb_device)) me.exit();
+        <<< "keyboard '" + hi.name() + "' ready", "" >>>;
     }
 
     fun GameTrak(int id, string server_ip, string kb_n) {
