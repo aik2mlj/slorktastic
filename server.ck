@@ -361,17 +361,23 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
                 for(int j; j < N; j++)
                 {
                     if(j != ID){
-                        ps[i].monologueBuf[j].gain((1.0 - y_norm) * 2.5);
+                        // ps[i].monologueBuf[j].gain((1.0 - y_norm) * 2.5);
+                        for(int k; k < ps[i].monologueBuf[j].maxVoices(); k++)
+                        {
+                            ps[i].monologueBuf[j].voiceGain(k, (1.0 - y_norm));
+                            ps[i].monologueBuf[j].rate(k, 1 + Math.random2f(-.5, .5) * y_norm);
+                        }
                     }
                     else
                     {
-                        ps[i].monologueBuf[j].gain(2.5);
+                        // ps[i].monologueBuf[j].gain(2.5);
+                        for(int k; k < ps[i].monologueBuf[j].maxVoices(); k++)
+                        {
+                            ps[i].monologueBuf[j].voiceGain(k, 2.5);
+                            ps[i].monologueBuf[j].rate(k, 1 + Math.random2f(-.5, .5) * y_norm);
+                        }
                     }
-                    for(int k; k < ps[i].monologueBuf[j].maxVoices(); k++)
-                    {
-                        // ps[i].monologueBuf[j].voiceGain(k, (1.0 - y_norm) * 2.5);
-                        ps[i].monologueBuf[j].rate(k, 1 + Math.random2f(-.5, .5) * y_norm);
-                    }
+
                     // ps[i].chorus[j].mix(z_norm * .6);
                     // ps[i].chorus[j].modDepth(y_norm * .75);
                     // if(j != ID){
