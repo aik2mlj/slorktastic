@@ -3,9 +3,10 @@ set -euo pipefail
 
 SLOT="${1:?usage: $0 <slot>   e.g. 0, 1, or 2}"
 
-jackd -d coreaudio -d 'Aggregated Potato' &
+jackd -d coreaudio -d '~:AMS2_Aggregate:0' &
 JACKD_PID=$!
-jack_wait -w
+
+sleep 2
 
 jacktrip -C cheese.local -J "$SLOT" &
 JACKTRIP_PID=$!
