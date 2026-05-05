@@ -107,6 +107,9 @@ class PlayerState {
     // Blackhole DAC channel
     int dac_channel;
 
+    // whether the player is recording (bool)
+    false => int RECORDING;
+
     Dyno lim_postFX;
     lim_postFX.slopeBelow(1.0);
     lim_postFX.slopeAbove(.01);
@@ -432,13 +435,17 @@ fun void playerListener() {
                     msg.getInt(0) => int ID;
                     msg.getInt(1) => int toggle;
                     // TODO: trigger record ON/OFF
-                    handleRecord(ID, toggle);
-                    string recordState;
-                    if (toggle)
-                        "ON" => recordState;
-                    else
-                        "OFF" => recordState;
-                    chout <= "player " <= ID <= " recording state: " <= recordState <= IO.newline();
+                    if(toggle != ps[ID].RECORDING)
+                    {
+                        handleRecord(ID, toggle);
+                        string recordState;
+                        if (toggle)
+                            "ON" => recordState;
+                        else
+                            "OFF" => recordState;
+                        chout <= "player " <= ID <= " recording state: " <= recordState <= IO.newline();
+                        toggle => ps[ID].RECORDING;
+                    }
                 }
             }
             if (msg.address == "/player/pop") {

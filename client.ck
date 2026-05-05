@@ -4,8 +4,8 @@ for (int i; i < 6; i++) {
     adc.chan(0) => dac.chan(i + 16);
 }
 
-// better localization: only the top speaker
-// adc.chan(0) => dac.chan(5);
+better localization: only the top speaker
+adc.chan(0) => dac.chan(5);
 
 GG.camera().orthographic();
 
@@ -24,6 +24,7 @@ spork ~ gt.update();
 spork ~ gt.throwListener();
 spork ~ gt.continuousControlListener();
 spork ~ gt.kbListener();
+spork ~ gt.continuousRecordBroadcast();
 
 while (true) {
     GG.nextFrame() => now;

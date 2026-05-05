@@ -110,7 +110,7 @@ public class GameTrak {
                     if(!RECORDING)
                     {
                         true => RECORDING;
-                        sendRecord(true);
+                        // sendRecord(true); send discrete trigger to server
                     }
                 }
                 else if (msg.isButtonUp()){
@@ -118,7 +118,7 @@ public class GameTrak {
                     if(RECORDING)
                     {
                         false => RECORDING;
-                        sendRecord(false);
+                        // sendRecord(false); // send discrete trigger to server
                     }
                 }
             }
@@ -225,8 +225,8 @@ public class GameTrak {
                     
                 } else {
                     if (msg.key == 44 && RECORDING) {
-                        false => RECORDING;
-                        sendRecord(false);
+                        // false => RECORDING;
+                        // sendRecord(false);
                         // now - recordingStart => recordingDuration;
                         // <<< "recording duration:", recordingDuration >>>;
                         // <<< "RECORDING OFF" >>>;
@@ -235,6 +235,15 @@ public class GameTrak {
                     }
                 }
             }
+        }
+    }
+
+    fun void continuousRecordBroadcast()
+    {
+        while(true)
+        {
+            100::ms => now;
+            sendRecord(RECORDING);
         }
     }
 
