@@ -8,7 +8,7 @@ JACKD_PID=$!
 
 sleep 2
 
-jacktrip -C cheese.local -J "$SLOT" &
+jacktrip -C cheese.local -J "$SLOT" -n 1 &
 JACKTRIP_PID=$!
 
 sleep 2

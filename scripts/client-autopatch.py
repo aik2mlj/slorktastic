@@ -39,10 +39,21 @@ def try_connect(src, dst):
             print(f"  failed {src} -> {dst}: {e}", flush=True)
 
 
+def disconnect_all():
+    for p in client.get_ports(is_output=True):
+        for conn in client.get_all_connections(p):
+            try:
+                client.disconnect(p.name, conn.name)
+                print(f"  x {p.name} -> {conn.name}", flush=True)
+            except jack.JackError as e:
+                print(f"  failed disconnect {p.name} -> {conn.name}: {e}", flush=True)
+
+
 def patch():
     send, recv = find_jacktrip_ports()
     if not (send and recv):
         return False
+    disconnect_all()
     try_connect(CAPTURE, send)
     try_connect(recv, PLAYBACK)
     return True
