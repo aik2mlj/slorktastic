@@ -4,7 +4,7 @@ for (int i; i < 6; i++) {
     adc.chan(0) => dac.chan(i + 16);
 }
 
-better localization: only the top speaker
+// better localization: only the top speaker
 adc.chan(0) => dac.chan(5);
 
 GG.camera().orthographic();
