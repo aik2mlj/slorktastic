@@ -12,7 +12,7 @@ CHEESE_IP="$(dscacheutil -q host -a name cheese.local | awk '/^ip_address:/ {pri
 : "${CHEESE_IP:?failed to resolve cheese.local}"
 echo "cheese.local -> $CHEESE_IP"
 
-jacktrip -C "$CHEESE_IP" -J "$SLOT" -n 1 &
+jacktrip -C "$CHEESE_IP" -K "$SLOT" -n 1 &
 JACKTRIP_PID=$!
 
 sleep 2
