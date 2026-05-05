@@ -352,10 +352,10 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
 
                 for(int j; j < N; j++)
                 {
-                    ps[i].chorus[j].mix(z_norm * .6);
+                    ps[i].chorus[j].mix(z_norm * 1.0);
                     ps[i].chorus[j].modDepth(y_norm * .25);
                     if(j != ID){
-                        ps[i].monologueBuf[j].gain(y_norm * 2.5);
+                        ps[i].monologueBuf[j].gain((1.0 - y_norm) * 2.5);
                     }
                 }
             }
