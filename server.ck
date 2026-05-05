@@ -171,7 +171,7 @@ class PlayerState {
             chorus[i] => dac.chan(dac_channel);
             chorus[i].mix(0);
             chorus[i].modDepth(0);
-            chorus[i].modFreq(50);
+            chorus[i].modFreq(2.5);
 
             monologuePath[i] => monologueBuf[i].read;
             if (!monologueBuf[i].ready())
