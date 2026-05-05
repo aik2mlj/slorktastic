@@ -6,7 +6,9 @@
 """Auto-patch JackTrip clients by their declared slot name (0, 1, 2, ...)."""
 
 import jack
+import queue
 import re
+import threading
 import time
 
 SLOTS = [
@@ -17,6 +19,7 @@ SLOTS = [
 JT_RE = re.compile(r"^(\d+):(send_1|receive_1)$")
 
 client = jack.Client("jacktrip-autopatch", no_start_server=True)
+work = queue.Queue()
 
 
 def try_connect(src, dst):
@@ -37,16 +40,24 @@ def patch_slot(slot):
     try_connect(capture, f"{slot}:send_1")
 
 
+def worker():
+    while True:
+        slot = work.get()
+        time.sleep(0.05)  # let sibling port register too
+        patch_slot(slot)
+
+
 def on_port(port, register):
     if not register:
         return
     m = JT_RE.match(port.name)
     if not m:
         return
-    time.sleep(0.05)  # let sibling port register too
-    patch_slot(int(m.group(1)))
+    # never call jack server functions from the notification thread
+    work.put(int(m.group(1)))
 
 
+threading.Thread(target=worker, daemon=True).start()
 client.set_port_registration_callback(on_port)
 client.activate()
 
@@ -54,7 +65,7 @@ client.activate()
 for p in client.get_ports():
     m = JT_RE.match(p.name)
     if m:
-        patch_slot(int(m.group(1)))
+        work.put(int(m.group(1)))
 
 print("autopatcher running. ctrl-c to quit.", flush=True)
 try:
