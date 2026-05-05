@@ -16,7 +16,7 @@ string kb_name;
 if (me.args()) {
     me.arg(0) => Std.atoi => id;
     me.arg(1) => server;
-    me.arg(2) => kb_device;
+    me.arg(2) => Std.atoi => kb_device;
 }
 
 // Set your ID and server IP here
