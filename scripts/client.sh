@@ -27,8 +27,14 @@ JACKTRIP_PID=$!
 
 sleep 2
 
-trap 'kill $JACKTRIP_PID $JACKD_PID 2>/dev/null' EXIT
-./client-autopatch.py
+./client-autopatch.py &
+AUTOPATCH_PID=$!
+
+sleep 2
+
+trap 'kill $AUTOPATCH_PID $JACKTRIP_PID $JACKD_PID 2>/dev/null' EXIT
+
+chuck --adc:"Apple Inc.: Potato" --dac:"Apple Inc.: Potato" -c28 client.ck:${SLOT}:cheese.local:0
 
 # turn wifi back on
 networksetup -setairportpower en0 on
