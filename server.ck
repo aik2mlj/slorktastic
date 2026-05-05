@@ -170,8 +170,9 @@ class PlayerState {
         for(int i; i < N; i++) {
             chorus[i] => dac.chan(dac_channel);
             chorus[i].mix(0);
+            chorus[i].baseDelay(15::ms);
             chorus[i].modDepth(0);
-            chorus[i].modFreq(2.5);
+            chorus[i].modFreq(5);
 
             monologuePath[i] => monologueBuf[i].read;
             if (!monologueBuf[i].ready())
@@ -352,10 +353,14 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
 
                 for(int j; j < N; j++)
                 {
-                    ps[i].chorus[j].mix(z_norm * 1.0);
-                    ps[i].chorus[j].modDepth(y_norm * .25);
+                    ps[i].chorus[j].mix(z_norm * .6);
+                    ps[i].chorus[j].modDepth(y_norm * .75);
                     if(j != ID){
                         ps[i].monologueBuf[j].gain((1.0 - y_norm) * 2.5);
+                    }
+                    else
+                    {
+                        ps[i].monologueBuf[j].gain(2.5);
                     }
                 }
             }
