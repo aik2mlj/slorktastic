@@ -110,6 +110,8 @@ class PlayerState {
     // whether the player is recording (bool)
     false => int RECORDING;
 
+    0 => int mode; // 0: loop + throw, 1: modulate monologue
+
     Dyno lim_postFX;
     lim_postFX.slopeBelow(1.0);
     lim_postFX.slopeAbove(.01);
@@ -138,8 +140,7 @@ class PlayerState {
         pRev[i].mix(0.5);
     }
 
-    SndBuf monologueBuf;
-
+    SndBuf monologueBuf[N] => Chorus chorus[N];
 
     // This is a stack of buffers, whatever on the top get recorded or thrown
     LiSaBuf bufs[MAX_BUFFER];
@@ -166,13 +167,19 @@ class PlayerState {
             <<< "Player", id, "buffer", bufs[i] >>>;
         }
 
-        monologueBuf => dac.chan(dac_channel);
-        monologuePath[ID] => monologueBuf.read;
-        if (!monologueBuf.ready())
-            <<< "failed to load monologue file", monologuePath[ID] >>>;
-        else
-            <<< "monologue file loaded", monologuePath[ID] >>>;
-        monologueBuf.gain(0);
+        for(int i; i < N; i++) {
+            chorus[i] => dac.chan(dac_channel);
+            chorus[i].mix(0);
+            chorus[i].modDepth(0);
+            chorus[i].modFreq(5.0);
+
+            monologuePath[i] => monologueBuf[i].read;
+            if (!monologueBuf[i].ready())
+                <<< "failed to load monologue file", monologuePath[i] >>>;
+            else
+                <<< "monologue file loaded", monologuePath[i] >>>;
+            monologueBuf[i].gain(0);
+        }
     }
 
     fun LiSaBuf @topBuf() { return bufs[p]; }
@@ -234,10 +241,12 @@ class PlayerState {
         }
     }
 
-    fun void playMonologue() {
-        monologueBuf.gain(2.5);
-        monologueBuf.pos(0);
-        monologueBuf.play();
+    fun void startMonologue() {
+        for(int i; i < N; i++) {
+            monologueBuf[i].gain(2.5);
+            monologueBuf[i].pos(0);
+            monologueBuf[i].play();
+        }
         while (true) {
             samp => now;
         }
@@ -298,38 +307,57 @@ fun void doSteal(int sourceID, float angle) {
 }
 
 fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos) {
-    for (int i; i < N; i++) {
-        if (ps[i].ID == ID) {
+    if(ps[ID].mode == 0) {
+        for (int i; i < N; i++) {
+            if (ps[i].ID == ID) {
 
-            Math.map2(x_pos, -1, 1, 0.0001, 2) => float shift_amt;
-            Math.clampf(Math.map2(z_pos, 0, .4, 0, 1.0), 0, 1.0) => float fx_mix;
-            // chout <= "current shift: " <= shift_amt <= IO.newline();
+                Math.map2(x_pos, -1, 1, 0.0001, 2) => float shift_amt;
+                Math.clampf(Math.map2(z_pos, 0, .4, 0, 1.0), 0, 1.0) => float fx_mix;
+                // chout <= "current shift: " <= shift_amt <= IO.newline();
 
-            // Math.map2(y_pos, -1, 1, 3000, 800) => float delay_ms;
-            // chout <= "current delay: " <= delay_ms <= IO.newline();
+                // Math.map2(y_pos, -1, 1, 3000, 800) => float delay_ms;
+                // chout <= "current delay: " <= delay_ms <= IO.newline();
 
-            // Math.map2(x_pos, -1, 1, .8, 4.0) => float rateScaling;
-            // chout <= "current interval scaling: " <= intervalScaling <= IO.newline();
-            Math.map2(y_pos, -1, 1, 0.0, 1.0) => float plinky_amt;
+                // Math.map2(x_pos, -1, 1, .8, 4.0) => float rateScaling;
+                // chout <= "current interval scaling: " <= intervalScaling <= IO.newline();
+                Math.map2(y_pos, -1, 1, 0.0, 1.0) => float plinky_amt;
 
-            for (int j; j < MAX_BUFFER; j++) {
-                ps[i].pitchS[j].mix(fx_mix);
-                ps[i].pitchS[j].shift(shift_amt);
+                for (int j; j < MAX_BUFFER; j++) {
+                    ps[i].pitchS[j].mix(fx_mix);
+                    ps[i].pitchS[j].shift(shift_amt);
 
-                ps[i].pRev[j].mix(fx_mix);
-                ps[i].pRev[j].shim(plinky_amt);
-                ps[i].pRev[j].wobble(plinky_amt);
+                    ps[i].pRev[j].mix(fx_mix);
+                    ps[i].pRev[j].shim(plinky_amt);
+                    ps[i].pRev[j].wobble(plinky_amt);
 
-                ps[i].bufs[j].MAX_GAIN_BASE + fx_mix * .01 => ps[i].bufs[j].MAX_GAIN;
+                    ps[i].bufs[j].MAX_GAIN_BASE + fx_mix * .01 => ps[i].bufs[j].MAX_GAIN;
 
-                // delay_ms::ms => ps[i].echoA[j].delay => ps[i].echoB[j].delay =>
-                // ps[i].echoC[j].delay;
-                // delay_ms::ms => ps[i].delayL[j].max => ps[i].delayL[j].delay;
-                // delay_ms::ms => ps[i].echoA[j].delay => ps[i].echoB[j].delay =>
+                    // delay_ms::ms => ps[i].echoA[j].delay => ps[i].echoB[j].delay =>
+                    // ps[i].echoC[j].delay;
+                    // delay_ms::ms => ps[i].delayL[j].max => ps[i].delayL[j].delay;
+                    // delay_ms::ms => ps[i].echoA[j].delay => ps[i].echoB[j].delay =>
 
-                // intervalScaling => ps[i].bufs[j].durationScalingFactor;
+                    // intervalScaling => ps[i].bufs[j].durationScalingFactor;
 
-                // rateScaling => ps[i].bufs[j].playbackRate;
+                    // rateScaling => ps[i].bufs[j].playbackRate;
+                }
+            }
+        }
+    }
+    else if(ps[ID].mode == 1) {
+        for(int i; i < N; i++) {
+            if (ps[i].ID == ID) {
+                Math.map2(y_pos, -1, 1, 1.0, 0.0) => float y_norm;
+                Math.map2(z_pos, 0, .8, 0.0, 1.0) => float z_norm;
+
+                for(int j; j < N; j++)
+                {
+                    ps[i].chorus[j].mix(z_norm);
+                    ps[i].chorus[j].modDepth(y_norm);
+                    if(j != ID){
+                        ps[i].monologueBuf[j].gain(y_norm);
+                    }
+                }
             }
         }
     }
@@ -397,7 +425,8 @@ fun void startMonologue() {
             ps[i].bufs[j].clear();
         }
         // start monologue for each player
-        spork ~ ps[i].playMonologue();
+        spork ~ ps[i].startMonologue();
+        1 => ps[i].mode;
 
         // lower gain of LiSa bufs
         // for (int j; j < ps[i].bufs.size(); j++) {
