@@ -1,4 +1,14 @@
 #!/usr/bin/env bash
+
+# turn wifi off
+networksetup -setairportpower en0 off
+cleanup() {
+    echo -e "\nShutting down..."
+    networksetup -setairportpower en0 on
+    exit 0
+}
+trap cleanup SIGINT
+
 set -euo pipefail
 
 SLOT="${1:?usage: $0 <slot>   e.g. 0, 1, or 2}"
@@ -19,3 +29,6 @@ sleep 2
 
 trap 'kill $JACKTRIP_PID $JACKD_PID 2>/dev/null' EXIT
 ./client-autopatch.py
+
+# turn wifi back on
+networksetup -setairportpower en0 on

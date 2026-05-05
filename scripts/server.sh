@@ -1,4 +1,14 @@
 #!/usr/bin/env bash
+
+# turn wifi off
+networksetup -setairportpower en0 off
+cleanup() {
+    echo -e "\nShutting down..."
+    networksetup -setairportpower en0 on
+    exit 0
+}
+trap cleanup SIGINT
+
 set -euo pipefail
 
 # 1. start jackd
@@ -18,3 +28,6 @@ sleep 1
 # 3. launch autopatcher in foreground so ctrl-c stops everything cleanly
 trap 'kill $JACKTRIP_PID $JACKD_PID 2>/dev/null' EXIT
 ./server-autopatch.py
+
+# turn wifi back on
+networksetup -setairportpower en0 on
