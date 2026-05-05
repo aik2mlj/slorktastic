@@ -576,7 +576,67 @@ fun void routeAudio(int sourceID, int targetID) {
     ps[sourceID].popBuf(oldBuf);
 }
 
+// Visualize the buffers on each playerstation
+// For each player station (i), for each buffer (j) we want to draw a horizontal bar where the length
+// is proportional to the recDuration of the buffer
+
+GG.camera().orthographic();
+GG.camera().viewSize(10);
+
+0.35 => float BAR_HEIGHT;
+0.08 => float BAR_GAP;
+0.6  => float PLAYER_GAP;
+1.0  => float SEC_TO_WORLD;        // 1 second of recording == 1 world unit wide
+-7.0 => float ORIGIN_X;            // left edge of all bars
+@(1.0, 0.55, 0.15) => vec3 TOP_COLOR;
+@(0.35, 0.45, 0.7) => vec3 BUF_COLOR;
+@(0.18, 0.18, 0.22) => vec3 BG_COLOR;
+
+(BAR_HEIGHT + BAR_GAP) * MAX_BUFFER + PLAYER_GAP => float ROW_PITCH;
+ROW_PITCH * (N - 1) / 2 => float yCenterOffset;
+
+GPlane bars[N][MAX_BUFFER];
+GPlane bgs[N][MAX_BUFFER];
+GText  plabel[N];
+
+for (int i; i < N; i++) {
+    yCenterOffset - i * ROW_PITCH => float rowY;
+
+    plabel[i] --> GG.scene();
+    plabel[i].text("P" + i);
+    plabel[i].posX(ORIGIN_X - 0.8);
+    plabel[i].posY(rowY);
+    plabel[i].sca(0.4);
+
+    for (int j; j < MAX_BUFFER; j++) {
+        rowY + ((MAX_BUFFER - 1) * 0.5 - j) * (BAR_HEIGHT + BAR_GAP) => float barY;
+
+        bgs[i][j] --> GG.scene();
+        bgs[i][j].posY(barY);
+        bgs[i][j].posX(ORIGIN_X + 5.0);
+        bgs[i][j].scaY(BAR_HEIGHT);
+        bgs[i][j].scaX(10.0);
+        bgs[i][j].color(BG_COLOR);
+
+        bars[i][j] --> GG.scene();
+        bars[i][j].posY(barY);
+        bars[i][j].scaY(BAR_HEIGHT);
+        bars[i][j].color(BUF_COLOR);
+    }
+}
 
 while (true) {
-    second => now;
+    for (int i; i < N; i++) {
+        for (int j; j < MAX_BUFFER; j++) {
+            (ps[i].bufs[j].recDuration / second) $ float => float secs;
+            Math.max(0.01, secs * SEC_TO_WORLD) => float w;
+            bars[i][j].scaX(w);
+            bars[i][j].posX(ORIGIN_X + w / 2);
+            if (j == ps[i].p)
+                bars[i][j].color(TOP_COLOR);
+            else
+                bars[i][j].color(BUF_COLOR);
+        }
+    }
+    GG.nextFrame() => now;
 }
