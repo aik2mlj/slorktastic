@@ -11,5 +11,7 @@ sleep 2
 jacktrip -C cheese.local -J "$SLOT" &
 JACKTRIP_PID=$!
 
+sleep 2
+
 trap 'kill $JACKTRIP_PID $JACKD_PID 2>/dev/null' EXIT
 ./client-autopatch.py
