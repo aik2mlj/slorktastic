@@ -282,7 +282,6 @@ class PlayerState {
     {
         112::second => now;
         <<< "Ending monologue, fading all bufs out" >>>;
-        // fadeBufsOut();
         for(int i; i < MAX_BUFFER; i++) {
             bufs[i].clear();
         }
@@ -443,7 +442,7 @@ fun void handleRecord(int ID, int toggle) {
             ps[i].topBuf() @=> LiSaBuf @buf;
 
             if (toggle) {
-                ps[i].fadeBufsOut();
+                // ps[i].fadeBufsOut();
                 now => buf.recStart;
                 buf.clear();
                 chout <= "recording started for player " <= ID <= IO.newline();
@@ -454,7 +453,7 @@ fun void handleRecord(int ID, int toggle) {
                 // also calculate the quantization
                 buf.setQuantize();
                 buf.lisa.record(false);
-                ps[i].fadeBufsIn();
+                // ps[i].fadeBufsIn();
             }
         }
     }
