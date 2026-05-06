@@ -120,12 +120,7 @@ class PlayerState {
 
     0 => int mode; // 0: loop + throw, 1: modulate monologue
 
-    Dyno lim_postFX;
-    lim_postFX.slopeBelow(1.0);
-    lim_postFX.slopeAbove(.01);
-    lim_postFX.thresh(.4);
-    lim_postFX.attackTime(10::ms);
-    lim_postFX.releaseTime(200::ms);
+    // Pre-FX limiter
     Dyno lim_preFx;
     lim_preFx.slopeBelow(1.0);
     lim_preFx.slopeAbove(.01);
@@ -134,14 +129,30 @@ class PlayerState {
     lim_preFx.releaseTime(200::ms);
     Gain preFX;
 
-    // effects for continuous control
+    // FX chain 
     Echo echoA[MAX_BUFFER];
     Echo echoB[MAX_BUFFER];
     Echo echoC[MAX_BUFFER];
     PitShift pitchS[MAX_BUFFER];
     DelayL delayL[MAX_BUFFER];
+
+    Dyno ducker;
+    ducker.slopeBelow(1.0);
+    ducker.slopeAbove(.2);
+    ducker.thresh(.25);
+    ducker.attackTime(10::ms);
+    ducker.releaseTime(500::ms);
+    ducker.externalSideInput(true);
     Gain postFX;
     postFX.gain(1.0);
+
+    // Post-FX limiter
+    Dyno lim_postFX;
+    lim_postFX.slopeBelow(1.0);
+    lim_postFX.slopeAbove(.01);
+    lim_postFX.thresh(.4);
+    lim_postFX.attackTime(10::ms);
+    lim_postFX.releaseTime(200::ms);
 
     PlinkyRev pRev[MAX_BUFFER];
     for (int i; i < MAX_BUFFER; i++) {
@@ -168,9 +179,9 @@ class PlayerState {
 
         // The adc & dac channel now won't change, only that some buffers may disconnect / reconnect
         // to the adc & dac channel
-        postFX => lim_postFX;
+        ducker => postFX => lim_postFX;
         for (int i; i < MAX_BUFFER; i++) {
-            adc.chan(adc_channel) => bufs[i].lisa => preFX => lim_preFx => pitchS[i] => pRev[i] => postFX;
+            adc.chan(adc_channel) => bufs[i].lisa => preFX => lim_preFx => pitchS[i] => pRev[i] => ducker;
             // adc.chan(adc_channel) => bufs[i].lisa => postFX;
             // delayL[i].gain(.99);
             // 4000::ms => delayL[i].max => delayL[i].delay;
@@ -286,6 +297,15 @@ class PlayerState {
             bufs[i].clear();
         }
     }
+
+    fun void kickListener()
+    {
+        while(true)
+        {
+            qtStatus.kick.last() => ducker.sideInput;
+            samp => now;
+        }
+    }
 }
 
 // Initialize N players, ID = i, ADC = i, DAC = i + 8
@@ -296,6 +316,7 @@ for (int i; i < N; i++) {
     for (int j; j < MAX_BUFFER; j++) {
         spork ~ ps[i].playLoop(j);
     }
+    spork ~ ps[i].kickListener();
 }
 
 // CLIENT -> SERVER
