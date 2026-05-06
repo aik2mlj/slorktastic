@@ -191,9 +191,9 @@ class PlayerState {
         }
         monologuePRev => dac.chan(dac_channel);
         monologuePRev.send(1);
-        monologuePRev.fade(.4);
-        monologuePRev.shim(.8);
-        monologuePRev.wobble(.25);        
+        monologuePRev.fade(.8);
+        monologuePRev.shim(1.0);
+        monologuePRev.wobble(0);        
     }
 
     fun LiSaBuf @topBuf() { return bufs[p]; }
