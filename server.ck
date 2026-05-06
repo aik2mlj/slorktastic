@@ -86,8 +86,7 @@ class LiSaBuf {
         //     lisa.voiceGain(0, MAX_GAIN * (1 - i / 100.0));
         //     1::ms => now;
         // }
-        lisa.getVoice() => int v;
-        lisa.rampDown(v, 100::ms);
+        lisa.rampDown(100::ms);
         100::ms => now;
     }
 
@@ -96,8 +95,7 @@ class LiSaBuf {
         //     lisa.voiceGain(0, MAX_GAIN * i / 100.0);
         //     1::ms => now;
         // }
-        lisa.getVoice() => int v;
-        lisa.rampUp(v, 100::ms);
+        lisa.rampUp(100::ms);
         100::ms => now;
     }
 
