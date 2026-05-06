@@ -141,7 +141,7 @@ class PlayerState {
     ducker.slopeAbove(.01);
     ducker.thresh(.01);
     ducker.attackTime(10::ms);
-    ducker.releaseTime(125::ms);
+    ducker.releaseTime(75::ms);
     ducker.externalSideInput(true);
     Gain postFX;
     postFX.gain(1.0);
