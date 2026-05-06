@@ -98,8 +98,8 @@ class LiSaBuf {
     fun void clear() {
         lisa.clear();
         lisa.recPos(0::samp);
-        100::second => recDuration;
-        setQuantize();
+        0::samp => recDuration;
+        0::samp => qtDuration;
     }
 }
 
@@ -417,8 +417,6 @@ fun void handleRecord(int ID, int toggle) {
             if (toggle) {
                 ps[i].fadeBufsOut();
                 now => buf.recStart;
-                0::ms => buf.recDuration;
-                0::ms => buf.qtDuration;
                 buf.clear();
                 chout <= "recording started for player " <= ID <= IO.newline();
                 buf.lisa.record(true);
