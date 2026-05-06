@@ -262,8 +262,9 @@ class PlayerState {
 
     fun void startMonologue() {
         for(int i; i < N; i++) {
+            monologueBuf[i].gain(2.5);
             for(int j; j < monologueBuf[i].maxVoices(); j++) {
-                monologueBuf[i].voiceGain(j, 2.5);
+                monologueBuf[i].voiceGain(j, 1);
                 monologueBuf[i].loop(j, 0);
                 monologueBuf[i].play(j, 1);
             }
