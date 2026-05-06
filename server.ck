@@ -83,7 +83,7 @@ class LiSaBuf {
 
     fun void fadeOut() {
         for (int i; i < 100; i++) {
-            lisa.gain(MAX_GAIN * (1 - (i $ float) / 100.0));
+            lisa.gain((1 - (i $ float) / 100.0));
             1::ms => now;
         }
         // lisa.rampDown(100::ms);
@@ -92,7 +92,7 @@ class LiSaBuf {
 
     fun void fadeIn() {
         for (int i; i < 100; i++) {
-            lisa.gain(MAX_GAIN * (i $ float) / 100.0);
+            lisa.gain((i $ float) / 100.0);
             1::ms => now;
         }
         // lisa.rampUp(100::ms);
