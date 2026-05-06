@@ -277,6 +277,7 @@ class PlayerState {
     fun void endMonologueFadeOut()
     {
         112::second => now;
+        <<< "Ending monologue, fading all bufs out" >>>;
         fadeBufsOut();
     }
 }

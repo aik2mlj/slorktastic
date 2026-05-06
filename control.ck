@@ -298,8 +298,8 @@ public class GameTrak {
     }
 
     fun void sendRecord(int toggle) {
-        chout <= "sending record signal to server: " <= toggle <= " to server: " <= SERVER_IP <=
-            IO.newline();
+        // chout <= "sending record signal to server: " <= toggle <= " to server: " <= SERVER_IP <=
+            // IO.newline();
         xmit.start("/player/record");
         ID => xmit.add;
         toggle => xmit.add;
