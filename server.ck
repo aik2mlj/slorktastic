@@ -82,17 +82,21 @@ class LiSaBuf {
     }
 
     fun void fadeOut() {
-        for (int i; i < 50; i++) {
-            lisa.voiceGain(0, MAX_GAIN * (1 - i / 100.0));
-            1::ms => now;
-        }
+        // for (int i; i < 100; i++) {
+        //     lisa.voiceGain(0, MAX_GAIN * (1 - i / 100.0));
+        //     1::ms => now;
+        // }
+        lisa.getVoice() => int v;
+        lisa.rampDown(v, 100::ms);
     }
 
     fun void fadeIn() {
-        for (int i; i < 50; i++) {
-            lisa.voiceGain(0, MAX_GAIN * i / 100.0);
-            1::ms => now;
-        }
+        // for (int i; i < 100; i++) {
+        //     lisa.voiceGain(0, MAX_GAIN * i / 100.0);
+        //     1::ms => now;
+        // }
+        lisa.getVoice() => int v;
+        lisa.rampUp(v, 100::ms);
     }
 
     fun void clear() {
