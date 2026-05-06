@@ -140,7 +140,7 @@ class PlayerState {
 
     PlinkyRev pRev[MAX_BUFFER];
     for (int i; i < MAX_BUFFER; i++) {
-        pRev[i].mix(0.5);
+        pRev[i].mix(0);
     }
 
     // SndBuf monologueBuf[N] => Chorus chorus[N];
@@ -177,8 +177,9 @@ class PlayerState {
         for(int i; i < N; i++) {
             monologueBuf[i].read(monologuePath[i]);
             monologueBuf[i].gain(0);
-            monologueBuf[i] => monologuePRev;
-            monologueBuf[i].maxVoices(8);
+            // monologueBuf[i] => monologuePRev;
+            monologueBuf[i].maxVoices(monologueMaxVoices);
+            monologueBuf[i] => dac.chan(dac_channel);
             // chorus[i] => dac.chan(dac_channel);
             // chorus[i].mix(0);
             // chorus[i].baseDelay(15::ms);
@@ -192,11 +193,11 @@ class PlayerState {
             //     <<< "monologue file loaded", monologuePath[i] >>>;
             // monologueBuf[i].gain(0);
         }
-        monologuePRev => dac.chan(dac_channel);
-        monologuePRev.send(1);
-        monologuePRev.fade(.8);
-        monologuePRev.shim(1.0);
-        monologuePRev.wobble(0);        
+        // monologuePRev => dac.chan(dac_channel);
+        // monologuePRev.send(1);
+        // monologuePRev.fade(.8);
+        // monologuePRev.shim(1.0);
+        // monologuePRev.wobble(0);        
     }
 
     fun LiSaBuf @topBuf() { return bufs[p]; }
@@ -368,16 +369,16 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
                 Math.map2(y_pos, -1, 1, 1.0, 0.0) => float y_norm;
                 Math.map2(z_pos, 0, .8, 0.0, 1.0) => float z_norm;
 
-                ps[i].monologuePRev.mix((y_norm * z_norm) * .5);
+                // ps[i].monologuePRev.mix((y_norm * z_norm) * .5);
                 for(int j; j < N; j++)
                 {
                     if(j != ID){
                         // ps[i].monologueBuf[j].gain((1.0 - y_norm) * 2.5);
-                        ps[i].monologueBuf[j].voiceGain(0, (y_norm * 3.5) / ps[i].monologueBuf[j].maxVoices());
+                        ps[i].monologueBuf[j].voiceGain(0, (y_norm * 4) / ps[i].monologueBuf[j].maxVoices());
                         for(int k; k < ps[i].monologueBuf[j].maxVoices(); k++)
                         {
                             ps[i].monologueBuf[j].voiceGain(k, (y_norm * 2.5) / ps[i].monologueBuf[j].maxVoices());
-                            ps[i].monologueBuf[j].rate(k, 1 + Math.random2f(-.2, .2) * y_norm * z_norm);
+                            ps[i].monologueBuf[j].rate(k, 1 + Math.random2f(-.25, .25) * y_norm * z_norm);
                         }
                     }
                     else
@@ -386,7 +387,7 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
                         // ps[i].monologueBuf[j].voiceGain(0, 3.5 / ps[i].monologueBuf[j].maxVoices());
                         for(int k; k < ps[i].monologueBuf[j].maxVoices(); k++)
                         {
-                            ps[i].monologueBuf[j].voiceGain(k, 3.5 / ps[i].monologueBuf[j].maxVoices());
+                            ps[i].monologueBuf[j].voiceGain(k, 4 / ps[i].monologueBuf[j].maxVoices());
                             // ps[i].monologueBuf[j].rate(k, 1 + Math.random2f(-.5, .5) * y_norm * z_norm);
                         }
                     }
