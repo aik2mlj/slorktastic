@@ -282,7 +282,10 @@ class PlayerState {
     {
         112::second => now;
         <<< "Ending monologue, fading all bufs out" >>>;
-        fadeBufsOut();
+        // fadeBufsOut();
+        for(int i; i < MAX_BUFFER; i++) {
+            bufs[i].clear();
+        }
     }
 }
 
