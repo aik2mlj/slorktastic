@@ -13,6 +13,11 @@ set -euo pipefail
 
 SLOT="${1:?usage: $0 <slot>   e.g. 0, 1, or 2}"
 
+# clear any leftover audio servers from a prior run
+pkill -x jacktrip 2>/dev/null || true
+pkill -x jackd    2>/dev/null || true
+sleep 1
+
 JACKD_LIST=$(jackd -d coreaudio -l 2>&1 || true)
 POTATO_DEV=$(printf '%s\n' "$JACKD_LIST" | awk -F"'" '$4 == "Potato" {print $6; exit}')
 if [[ -z "$POTATO_DEV" ]]; then

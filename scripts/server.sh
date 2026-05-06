@@ -11,6 +11,11 @@ trap cleanup SIGINT
 
 set -euo pipefail
 
+# clear any leftover audio servers from a prior run
+pkill -x jacktrip 2>/dev/null || true
+pkill -x jackd    2>/dev/null || true
+sleep 1
+
 # 1. start jackd
 jackd -d coreaudio -d 'BlackHole16ch_UID' &
 JACKD_PID=$!
