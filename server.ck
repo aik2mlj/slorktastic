@@ -634,7 +634,9 @@ for (int i; i < N; i++) {
 while (true) {
     for (int i; i < N; i++) {
         for (int j; j < MAX_BUFFER; j++) {
-            (ps[i].bufs[j].recDuration / second) $ float => float secs;
+            ps[i].p => int pointer;
+            (pointer + j) % MAX_BUFFER => int bufIdx;
+            (ps[i].bufs[bufIdx].recDuration / second) $ float => float secs;
             // clear() parks recDuration at 100s to mark the buffer empty — treat as 0
             if (secs > 11.0)
                 0.0 => secs;
@@ -642,7 +644,7 @@ while (true) {
             bars[i][j].scaX(w);
             bars[i][j].posX(ORIGIN_X + w / 2);
             bars[i][j].posZ(0.1);
-            if (j == ps[i].p)
+            if (j == 0)
                 bars[i][j].color(TOP_COLOR);
             else
                 bars[i][j].color(BUF_COLOR);
