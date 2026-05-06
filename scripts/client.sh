@@ -13,8 +13,13 @@ set -euo pipefail
 
 SLOT="${1:?usage: $0 <slot>   e.g. 0, 1, or 2}"
 
-POTATO_DEV=$(jackd -d coreaudio -l 2>&1 | awk -F"'" '$4 == "Potato" {print $6; exit}')
-: "${POTATO_DEV:?could not find coreaudio device named 'Potato'}"
+JACKD_LIST=$(jackd -d coreaudio -l 2>&1 || true)
+POTATO_DEV=$(printf '%s\n' "$JACKD_LIST" | awk -F"'" '$4 == "Potato" {print $6; exit}')
+if [[ -z "$POTATO_DEV" ]]; then
+    echo "could not find coreaudio device named 'Potato'. jackd -l output:" >&2
+    echo "$JACKD_LIST" >&2
+    exit 1
+fi
 echo "Potato -> $POTATO_DEV"
 
 jackd -d coreaudio -d "$POTATO_DEV" &
