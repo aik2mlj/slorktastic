@@ -3,7 +3,7 @@
 lib/**
 !.gitkeep
 # examples/
-
+.DS_Store
 *.mp4
 *.unitypackage
 imgui.ini
