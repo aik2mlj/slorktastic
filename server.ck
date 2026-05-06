@@ -597,8 +597,8 @@ GG.camera().viewSize(20);
 1.0  => float SEC_TO_WORLD;        // 1 second of recording == 1 world unit wide
 10.0 => float MAX_BAR_WIDTH;       // matches MAX_BUFFER_DURATION (10s)
 -7.0 => float ORIGIN_X;            // left edge of all bars
-@(1.0, 0.55, 0.15) => vec3 TOP_COLOR;
-@(0.35, 0.45, 0.7) => vec3 BUF_COLOR;
+// @(1.0, 0.55, 0.15) => vec3 TOP_COLOR;
+// @(0.35, 0.45, 0.7) => vec3 BUF_COLOR;
 @(0.18, 0.18, 0.22) => vec3 BG_COLOR;
 
 (BAR_HEIGHT + BAR_GAP) * MAX_BUFFER + PLAYER_GAP => float ROW_PITCH;
@@ -631,7 +631,9 @@ for (int i; i < N; i++) {
         bars[i][j].posY(barY);
         bars[i][j].posZ(0.1);          // sit on top of the gray bg
         bars[i][j].scaY(BAR_HEIGHT);
-        bars[i][j].color(BUF_COLOR);
+
+        // randomize the color of each bar
+        bars[i][j].color(@(Math.random2f(0.1, 0.9), Math.random2f(0.1, 0.9), Math.random2f(0.1, 0.9)));
     }
 }
 
@@ -639,7 +641,7 @@ while (true) {
     for (int i; i < N; i++) {
         for (int j; j < MAX_BUFFER; j++) {
             ps[i].p => int pointer;
-            (pointer + j) % MAX_BUFFER => int bufIdx;
+            (pointer - j + MAX_BUFFER) % MAX_BUFFER => int bufIdx;
             (ps[i].bufs[bufIdx].recDuration / second) $ float => float secs;
             // clear() parks recDuration at 100s to mark the buffer empty — treat as 0
             if (secs > 11.0)
@@ -648,10 +650,6 @@ while (true) {
             bars[i][j].scaX(w);
             bars[i][j].posX(ORIGIN_X + w / 2);
             bars[i][j].posZ(0.1);
-            if (j == 0)
-                bars[i][j].color(TOP_COLOR);
-            else
-                bars[i][j].color(BUF_COLOR);
         }
     }
     GG.nextFrame() => now;
