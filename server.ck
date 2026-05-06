@@ -264,7 +264,7 @@ class PlayerState {
         for(int i; i < N; i++) {
             monologueBuf[i].gain(2.5);
             for(int j; j < monologueBuf[i].maxVoices(); j++) {
-                monologueBuf[i].voiceGain(j, 1);
+                monologueBuf[i].voiceGain(j, 1.0 / monologueBuf[i].maxVoices());
                 monologueBuf[i].loop(j, 0);
                 monologueBuf[i].play(j, 1);
             }
@@ -395,10 +395,10 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
                 {
                     if(j != ID){
                         // ps[i].monologueBuf[j].gain((1.0 - y_norm) * 2.5);
-                        ps[i].monologueBuf[j].voiceGain(0, (y_norm * .8));
+                        ps[i].monologueBuf[j].voiceGain(0, (y_norm * .8) / ps[i].monologueBuf[j].maxVoices());
                         for(int k; k < ps[i].monologueBuf[j].maxVoices(); k++)
                         {
-                            ps[i].monologueBuf[j].voiceGain(k, (y_norm * .8));
+                            ps[i].monologueBuf[j].voiceGain(k, (y_norm * .8) / ps[i].monologueBuf[j].maxVoices());
                             ps[i].monologueBuf[j].rate(k, 1 + Math.random2f(-.25, .25) * y_norm * z_norm);
                         }
                     }
@@ -408,7 +408,7 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
                         // ps[i].monologueBuf[j].voiceGain(0, 3.5 / ps[i].monologueBuf[j].maxVoices());
                         for(int k; k < ps[i].monologueBuf[j].maxVoices(); k++)
                         {
-                            ps[i].monologueBuf[j].voiceGain(k, .8);
+                            ps[i].monologueBuf[j].voiceGain(k, .8 / ps[i].monologueBuf[j].maxVoices());
                             // ps[i].monologueBuf[j].rate(k, 1 + Math.random2f(-.5, .5) * y_norm * z_norm);
                         }
                     }
