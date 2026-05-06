@@ -333,6 +333,7 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
 
                 Math.map2(x_pos, -1, 1, 0.0001, 2) => float shift_amt;
                 Math.clampf(Math.map2(z_pos, 0, .4, 0, 1.0), 0, 1.0) => float fx_mix;
+                Math.map2(y_pos, -1, 1, 0, 1.0) => float y_norm;
                 // chout <= "current shift: " <= shift_amt <= IO.newline();
 
                 // Math.map2(y_pos, -1, 1, 3000, 800) => float delay_ms;
@@ -350,7 +351,7 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
                     ps[i].pRev[j].shim(plinky_amt);
                     ps[i].pRev[j].wobble(plinky_amt);
 
-                    ps[i].bufs[j].MAX_GAIN_BASE + fx_mix * .5 => ps[i].bufs[j].MAX_GAIN;
+                    ps[i].bufs[j].MAX_GAIN_BASE + fx_mix * .6 * y_norm => ps[i].bufs[j].MAX_GAIN;
 
                     // delay_ms::ms => ps[i].echoA[j].delay => ps[i].echoB[j].delay =>
                     // ps[i].echoC[j].delay;
@@ -375,7 +376,7 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
                     ps[i].pRev[b].mix(.5);
                     ps[i].pRev[b].shim(1.0);
                     ps[i].pRev[b].wobble(0);
-                    ps[i].bufs[b].MAX_GAIN_BASE => ps[i].bufs[b].MAX_GAIN;
+                    ps[i].bufs[b].MAX_GAIN_BASE * .5 => ps[i].bufs[b].MAX_GAIN;
                 }
 
                 Math.map2(y_pos, -1, 1, 1.0, 0.0) => float y_norm;
