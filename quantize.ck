@@ -30,7 +30,7 @@ public class QuantizeStatus {
     fun void playKickLoop() {
         while (true) {
             if (on) {
-                <<< "playing kick" >>>;
+                // <<< "playing kick" >>>;
                 0 => kick.pos;
                 loopDur => now;
             } else {
