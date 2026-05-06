@@ -31,6 +31,8 @@ AUTOPATCH_PID=$!
 
 sleep 1
 
+osascript -e "set Volume 4"
+
 CHUCK_PID=
 start_chuck() {
     chuck --adc:"Existential Audio Inc.: BlackHole 16ch" --dac:"Existential Audio Inc.: BlackHole 16ch" -c16 server.ck &

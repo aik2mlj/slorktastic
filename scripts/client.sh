@@ -32,6 +32,8 @@ AUTOPATCH_PID=$!
 
 sleep 1
 
+osascript -e "set Volume 4"
+
 kb_device=$(chuck --probe 2>&1 | awk '/keyboard/{kb=1} kb && /Apple Internal Keyboard/{gsub(/[][]/, "", $2); print $2; exit}')
 
 CHUCK_PID=
