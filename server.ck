@@ -99,6 +99,7 @@ class LiSaBuf {
         lisa.clear();
         lisa.recPos(0::samp);
         100::second => recDuration;
+        setQuantize();
     }
 }
 
