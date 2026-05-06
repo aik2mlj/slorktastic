@@ -25,6 +25,9 @@ class LiSaBuf {
     1.0 => float playbackRate;
     dur qtDuration;
 
+    // for visualization
+    @(Math.random2f(0.1, 0.9), Math.random2f(0.1, 0.9), Math.random2f(0.1, 0.9)) => vec3 color;
+
     .25 => float MAX_GAIN_BASE;
     .25 => float MAX_GAIN;
 
@@ -589,14 +592,14 @@ fun void routeAudio(int sourceID, int targetID) {
 // is proportional to the recDuration of the buffer
 
 GG.camera().orthographic();
-GG.camera().viewSize(20);
+GG.camera().viewSize(12);
 
 0.35 => float BAR_HEIGHT;
 0.08 => float BAR_GAP;
 0.6  => float PLAYER_GAP;
 1.0  => float SEC_TO_WORLD;        // 1 second of recording == 1 world unit wide
 10.0 => float MAX_BAR_WIDTH;       // matches MAX_BUFFER_DURATION (10s)
--7.0 => float ORIGIN_X;            // left edge of all bars
+-5.0 => float ORIGIN_X;            // left edge of all bars
 // @(1.0, 0.55, 0.15) => vec3 TOP_COLOR;
 // @(0.35, 0.45, 0.7) => vec3 BUF_COLOR;
 @(0.18, 0.18, 0.22) => vec3 BG_COLOR;
@@ -631,9 +634,6 @@ for (int i; i < N; i++) {
         bars[i][j].posY(barY);
         bars[i][j].posZ(0.1);          // sit on top of the gray bg
         bars[i][j].scaY(BAR_HEIGHT);
-
-        // randomize the color of each bar
-        bars[i][j].color(@(Math.random2f(0.1, 0.9), Math.random2f(0.1, 0.9), Math.random2f(0.1, 0.9)));
     }
 }
 
@@ -643,6 +643,7 @@ while (true) {
             ps[i].p => int pointer;
             (pointer - j + MAX_BUFFER) % MAX_BUFFER => int bufIdx;
             (ps[i].bufs[bufIdx].recDuration / second) $ float => float secs;
+            bars[i][j].color(ps[i].bufs[bufIdx].color);
             // clear() parks recDuration at 100s to mark the buffer empty — treat as 0
             if (secs > 11.0)
                 0.0 => secs;
