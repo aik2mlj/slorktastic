@@ -190,6 +190,10 @@ class PlayerState {
             // monologueBuf[i].gain(0);
         }
         monologuePRev => dac.chan(dac_channel);
+        monologuePRev.send(1);
+        monologuePRev.fade(.4);
+        monologuePRev.shim(.8);
+        monologuePRev.wobble(.25);        
     }
 
     fun LiSaBuf @topBuf() { return bufs[p]; }
@@ -361,7 +365,7 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
                 Math.map2(y_pos, -1, 1, 1.0, 0.0) => float y_norm;
                 Math.map2(z_pos, 0, .8, 0.0, 1.0) => float z_norm;
 
-                ps[i].monologuePRev.mix((y_norm * z_norm) * .2);
+                ps[i].monologuePRev.mix((y_norm * z_norm) * .5);
                 for(int j; j < N; j++)
                 {
                     if(j != ID){
@@ -370,7 +374,7 @@ fun void continuousControlListener(int ID, float x_pos, float y_pos, float z_pos
                         for(int k; k < ps[i].monologueBuf[j].maxVoices(); k++)
                         {
                             ps[i].monologueBuf[j].voiceGain(k, (y_norm * 2.5) / ps[i].monologueBuf[j].maxVoices());
-                            ps[i].monologueBuf[j].rate(k, 1 + Math.random2f(-.5, .5) * y_norm * z_norm);
+                            ps[i].monologueBuf[j].rate(k, 1 + Math.random2f(-.2, .2) * y_norm * z_norm);
                         }
                     }
                     else
