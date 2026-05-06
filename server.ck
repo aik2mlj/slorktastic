@@ -139,9 +139,9 @@ class PlayerState {
     Dyno ducker;
     ducker.slopeBelow(1.0);
     ducker.slopeAbove(.001);
-    ducker.thresh(.01);
+    ducker.thresh(.001);
     ducker.attackTime(10::ms);
-    ducker.releaseTime(750::ms);
+    ducker.releaseTime(125::ms);
     ducker.externalSideInput(true);
     Gain postFX;
     postFX.gain(1.0);
