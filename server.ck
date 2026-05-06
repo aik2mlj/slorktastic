@@ -88,6 +88,7 @@ class LiSaBuf {
         // }
         lisa.getVoice() => int v;
         lisa.rampDown(v, 100::ms);
+        100::ms => now;
     }
 
     fun void fadeIn() {
@@ -97,6 +98,7 @@ class LiSaBuf {
         // }
         lisa.getVoice() => int v;
         lisa.rampUp(v, 100::ms);
+        100::ms => now;
     }
 
     fun void clear() {
